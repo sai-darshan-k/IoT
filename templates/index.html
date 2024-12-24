@@ -8,26 +8,46 @@
         body {
             font-family: Arial, sans-serif;
             margin: 20px;
+            padding: 20px;
+            background-color: #f4f4f9;
         }
         h1 {
             color: #333;
         }
-        .data {
-            margin-top: 20px;
-            padding: 10px;
+        table {
+            width: 50%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        table, th, td {
             border: 1px solid #ddd;
-            border-radius: 5px;
-            background-color: #f9f9f9;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
         }
     </style>
 </head>
 <body>
-    <h1>ESP32 Sensor Data</h1>
-    <div class="data">
-        <p><strong>Temperature:</strong> {{ data.get('temperature', 'N/A') }} °C</p>
-        <p><strong>Humidity:</strong> {{ data.get('humidity', 'N/A') }} %</p>
-        <p><strong>Rain Intensity:</strong> {{ data.get('rain_intensity', 'N/A') }}</p>
-        <p><strong>Rain Detected:</strong> {{ data.get('rain_detected', 'N/A') }}</p>
-    </div>
+    <h1>Live Sensor Data</h1>
+    {% if data %}
+    <table>
+        <tr>
+            <th>Parameter</th>
+            <th>Value</th>
+        </tr>
+        {% for key, value in data.items() %}
+        <tr>
+            <td>{{ key }}</td>
+            <td>{{ value }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+    {% else %}
+    <p>No data received yet.</p>
+    {% endif %}
 </body>
 </html>

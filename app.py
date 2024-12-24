@@ -19,7 +19,7 @@ def receive_sensor_data():
 # Webpage to display sensor data
 @app.route('/')
 def index():
-    return jsonify(sensor_data)
+    return render_template('index.html', data=sensor_data)
 
 if __name__ == "__main__":
     app.run(debug=True)
