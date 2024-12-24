@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sensor Data</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        h1 {
+            color: #333;
+        }
+        .data {
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+    </style>
+</head>
+<body>
+    <h1>ESP32 Sensor Data</h1>
+    <div class="data">
+        <p><strong>Temperature:</strong> {{ data.get('temperature', 'N/A') }} °C</p>
+        <p><strong>Humidity:</strong> {{ data.get('humidity', 'N/A') }} %</p>
+        <p><strong>Rain Intensity:</strong> {{ data.get('rain_intensity', 'N/A') }}</p>
+        <p><strong>Rain Detected:</strong> {{ data.get('rain_detected', 'N/A') }}</p>
+    </div>
+</body>
+</html>
