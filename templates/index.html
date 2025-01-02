@@ -3,51 +3,392 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sensor Data</title>
+    <title>Sensor Dashboard</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script>
     <style>
         body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
+            font-family: 'Arial', sans-serif;
+            background-color: #f0f2f5;
+            margin: 0;
             padding: 20px;
-            background-color: #f4f4f9;
         }
-        h1 {
-            color: #333;
+
+        .dashboard {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
         }
-        table {
-            width: 50%;
-            border-collapse: collapse;
-            margin: 20px 0;
+
+        .sensor-card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            height: 300px;
         }
-        table, th, td {
-            border: 1px solid #ddd;
+
+        .chart-container {
+            height: 200px;
+            margin-top: 15px;
+            position: relative;
+            width: 100%;
         }
-        th, td {
+
+        .sensor-title {
+            color: #7f8c8d;
+            font-size: 1.2em;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .gauge-container {
+            position: relative;
+            width: 200px;
+            height: 200px;
+            margin: 0 auto;
+        }
+
+        .gauge-value {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 1.5em;
+            font-weight: bold;
+        }
+
+        .rain-status {
             padding: 10px;
-            text-align: left;
+            border-radius: 5px;
+            text-align: center;
+            font-weight: bold;
         }
-        th {
-            background-color: #f2f2f2;
+
+        .rain-active { background-color: #e74c3c; color: white; }
+        .rain-inactive { background-color: #2ecc71; color: white; }
+
+        .rain-image {
+            text-align: center;
+            margin-top: 150px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 4px;
+        }
+
+        .water-level-container {
+            position: relative;
+            width: 200px;
+            height: 200px;
+            margin: 0 auto;
+        }
+
+        .water-circle {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            border: 4px solid #ecf0f1;
+            overflow: hidden;
+        }
+
+        .water-fill {
+            position: absolute;
+            width: 100%;
+            bottom: 0;
+            background: #3498db;
+            transition: height 0.5s ease-in-out;
+        }
+
+        .water-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            z-index: 1;
+        }
+
+        .water-percentage {
+            font-size: 2em;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .water-status {
+            font-size: 0.9em;
+            color: #7f8c8d;
+        }
+
+        @keyframes wave {
+            0% { transform: translateX(-100%) }
+            100% { transform: translateX(100%) }
+        }
+
+        .water-wave {
+            position: absolute;
+            width: 200%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            animation: wave 2s linear infinite;
         }
     </style>
 </head>
 <body>
-    <h1>Live Sensor Data</h1>
-    {% if data %}
-    <table>
-        <tr>
-            <th>Parameter</th>
-            <th>Value</th>
-        </tr>
-        {% for key, value in data.items() %}
-        <tr>
-            <td>{{ key }}</td>
-            <td>{{ value }}</td>
-        </tr>
-        {% endfor %}
-    </table>
-    {% else %}
-    <p>No data received yet.</p>
-    {% endif %}
+    <div class="dashboard">
+        <div class="sensor-card">
+            <div class="sensor-title">Temperature</div>
+            <div class="gauge-container">
+                <canvas id="tempGauge"></canvas>
+                <div class="gauge-value"><span id="temp-value">--</span>°C</div>
+            </div>
+        </div>
+
+        <div class="sensor-card">
+            <div class="sensor-title">Humidity</div>
+            <div class="gauge-container">
+                <canvas id="humidityGauge"></canvas>
+                <div class="gauge-value"><span id="humidity-value">--</span>%</div>
+            </div>
+        </div>
+
+        <div class="sensor-card">
+            <div class="sensor-title">Rain Detection</div>
+            <div id="rain-status" class="rain-status">No Data</div>
+            <div class="rain-image" id="rain-image"></div>
+            <div class="chart-container">
+                <canvas id="rainChart"></canvas>
+            </div>
+        </div>
+
+        <div class="sensor-card">
+            <div class="sensor-title">Rain Intensity</div>
+            <div class="chart-container">
+                <canvas id="rainIntensityChart"></canvas>
+            </div>
+        </div>
+
+        <div class="sensor-card">
+            <div class="sensor-title">Soil Moisture</div>
+            <div class="chart-container">
+                <canvas id="soilChart"></canvas>
+            </div>
+        </div>
+
+        <div class="sensor-card">
+            <div class="sensor-title">Water Level</div>
+            <div class="water-level-container">
+                <div class="water-circle">
+                    <div class="water-fill" id="water-fill">
+                        <div class="water-wave"></div>
+                    </div>
+                </div>
+                <div class="water-text">
+                    <div class="water-percentage" id="water-percentage">0%</div>
+                    <div class="water-status" id="water-status">No Data</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+const WATER_LEVELS = {
+    THRESHOLDS: {
+        VERY_WET: 2500,
+        SHALLOW_WET: 1700,
+        MODERATELY_WET: 1300
+    },
+    PERCENTAGES: {
+        VERY_WET: 0,
+        SHALLOW_WET: 40,
+        MODERATELY_WET: 75,
+        DEEP_WET: 95
+    }
+};
+
+function getWaterStatus(value) {
+    if (value >= WATER_LEVELS.THRESHOLDS.VERY_WET) return 'Dry';
+    if (value >= WATER_LEVELS.THRESHOLDS.SHALLOW_WET) return 'Shallow Wet';
+    if (value >= WATER_LEVELS.THRESHOLDS.MODERATELY_WET) return 'Moderately Wet';
+    return 'Deep Wet';
+}
+
+function getWaterColor(value) {
+    if (value >= WATER_LEVELS.THRESHOLDS.VERY_WET) return '#3498db';
+    if (value >= WATER_LEVELS.THRESHOLDS.SHALLOW_WET) return '#2980b9';
+    if (value >= WATER_LEVELS.THRESHOLDS.MODERATELY_WET) return '#1f618d';
+    return '#154360';
+}
+
+function getWaterPercentage(value) {
+    if (value >= WATER_LEVELS.THRESHOLDS.VERY_WET) return WATER_LEVELS.PERCENTAGES.VERY_WET;
+    if (value >= WATER_LEVELS.THRESHOLDS.SHALLOW_WET) return WATER_LEVELS.PERCENTAGES.SHALLOW_WET;
+    if (value >= WATER_LEVELS.THRESHOLDS.MODERATELY_WET) return WATER_LEVELS.PERCENTAGES.MODERATELY_WET;
+    return WATER_LEVELS.PERCENTAGES.DEEP_WET;
+}
+
+function updateWaterLevel(value) {
+    if (value == null || isNaN(value)) {
+        document.getElementById('water-percentage').textContent = '--%';
+        document.getElementById('water-status').textContent = 'No Data';
+        document.getElementById('water-fill').style.height = '0%';
+        document.getElementById('water-fill').style.backgroundColor = '#ecf0f1';
+        return;
+    }
+
+    const percentage = getWaterPercentage(value);
+    const status = getWaterStatus(value);
+    const color = getWaterColor(value);
+
+    const waterFill = document.getElementById('water-fill');
+    const waterPercentage = document.getElementById('water-percentage');
+    const waterStatus = document.getElementById('water-status');
+
+    waterFill.style.height = `${percentage}%`;
+    waterFill.style.backgroundColor = color;
+    waterPercentage.textContent = `${percentage}%`;
+    waterStatus.textContent = status;
+}
+        const createGauge = (ctx, label, maxValue) => {
+            return new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    datasets: [{
+                        data: [0, maxValue],
+                        backgroundColor: ['#3498db', '#ecf0f1'],
+                        circumference: 270,
+                        rotation: 135
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    cutout: '70%',
+                    plugins: {
+                        legend: { display: false }
+                    }
+                }
+            });
+        };
+
+        const createLineChart = (ctx, label) => {
+            return new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        label: label,
+                        data: [],
+                        borderColor: '#3498db',
+                        tension: 0.4,
+                        fill: false
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: { beginAtZero: true }
+                    }
+                }
+            });
+        };
+
+        const charts = {
+            tempGauge: createGauge(document.getElementById('tempGauge').getContext('2d'), 'Temperature', 50),
+            humidityGauge: createGauge(document.getElementById('humidityGauge').getContext('2d'), 'Humidity', 100),
+            rainIntensity: createLineChart(document.getElementById('rainIntensityChart').getContext('2d'), 'Rain Intensity'),
+            soil: createLineChart(document.getElementById('soilChart').getContext('2d'), 'Soil Moisture'),
+        };
+
+        function updateGauge(chart, value, maxValue) {
+            chart.data.datasets[0].data = [value, maxValue - value];
+            chart.update();
+        }
+
+        function updateLineChart(chart, value) {
+            const now = new Date().toLocaleTimeString();
+            chart.data.labels.push(now);
+            chart.data.datasets[0].data.push(value);
+            if (chart.data.labels.length > 10) {
+                chart.data.labels.shift();
+                chart.data.datasets[0].data.shift();
+            }
+            chart.update();
+        }
+
+        function updateRainStatus(isRainDetected) {
+            const rainStatus = document.getElementById('rain-status');
+            const rainImage = document.getElementById('rain-image');
+            const currentHour = new Date().getHours();
+
+            if (isRainDetected) {
+                rainStatus.innerHTML = 'Rain Detected';
+                rainStatus.className = 'rain-status rain-active';
+                rainImage.innerHTML = '<img src="https://media.tenor.com/YefQKTdi3hUAAAAj/rafsdesign-rafsdesigns.gif" alt="Rain" width="100" height="100">';
+            } else {
+                rainStatus.innerHTML = 'No Rain';
+                rainStatus.className = 'rain-status rain-inactive';
+                
+                if (currentHour >= 6 && currentHour < 18) {
+                    rainImage.innerHTML = '<img src="https://media1.tenor.com/m/gUKy0QmrNHIAAAAC/sun-sunlight.gif" alt="Sunlight" width="100" height="100">';
+                } else {
+                    rainImage.innerHTML = '<img src="https://media.tenor.com/DTIl6DWhrZwAAAAj/moon-spacedoodles.gif" alt="Moonlight" width="100" height="100">';
+                }
+            }
+        }
+
+// Update the convertSoilMoistureToWaterLevel function to match the new thresholds
+function convertSoilMoistureToWaterLevel(soilMoisture) {
+    return soilMoisture; // Now we can pass the soil moisture value directly
+}
+
+// Update the updateDashboard function to include the conversion
+async function updateDashboard() {
+    try {
+        const response = await fetch('/sensor-data');
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+        const data = await response.json();
+        
+        if (data.temperature !== null) {
+            document.getElementById('temp-value').textContent = data.temperature.toFixed(1);
+            updateGauge(charts.tempGauge, data.temperature, 50);
+        }
+        
+        if (data.humidity !== null) {
+            document.getElementById('humidity-value').textContent = data.humidity.toFixed(1);
+            updateGauge(charts.humidityGauge, data.humidity, 100);
+        }
+        
+        if (data.rain_detected !== null) updateRainStatus(data.rain_detected);
+        if (data.rain_intensity !== null) updateLineChart(charts.rainIntensity, data.rain_intensity);
+        if (data.soil_moisture !== null) {
+            updateLineChart(charts.soil, data.soil_moisture);
+            const waterLevel = convertSoilMoistureToWaterLevel(data.soil_moisture);
+            updateWaterLevel(waterLevel);
+        }
+        
+    } catch (error) {
+        console.error('Error fetching sensor data:', error);
+    }
+}
+
+        updateDashboard();
+        const updateInterval = setInterval(updateDashboard, 5000);
+
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) {
+                clearInterval(updateInterval);
+            } else {
+                updateDashboard();
+                setInterval(updateDashboard, 5000);
+            }
+        });
+    </script>
 </body>
 </html>

@@ -1,25 +1,35 @@
 from flask import Flask, request, jsonify, render_template
+import threading
 
 app = Flask(__name__)
 
-# Store sensor data in memory (for demo purposes)
-sensor_data = {}
+sensor_data = {
+    "temperature": None,
+    "humidity": None,
+    "rain_intensity": None,
+    "rain_detected": None,
+    "soil_moisture": None,
+    "water_layer": None,
+}
 
-# Endpoint to receive sensor data from ESP32
-@app.route('/sensor-data', methods=['POST'])
-def receive_sensor_data():
+data_lock = threading.Lock()
+
+@app.route('/sensor-data', methods=['POST', 'GET'])
+def update_sensor_data():
     global sensor_data
-    sensor_data = request.get_json()
-    if not sensor_data:
-        return jsonify({"error": "Invalid data"}), 400
+    if request.method == 'POST':
+        if request.is_json:
+            with data_lock:
+                sensor_data.update(request.get_json())
+            return jsonify({"message": "Data updated"}), 200
+        return jsonify({"error": "Invalid JSON"}), 400
+    elif request.method == 'GET':
+        with data_lock:
+            return jsonify(sensor_data), 200
 
-    print(f"Received data: {sensor_data}")
-    return jsonify({"message": "Data received successfully"}), 200
-
-# Webpage to display sensor data
 @app.route('/')
 def index():
-    return render_template('index.html', data=sensor_data)
+    return render_template('index.html')
 
-if __name__ == "__main__":
-    app.run(debug=True)
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=5000, debug=True)
