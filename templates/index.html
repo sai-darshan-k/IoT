@@ -423,6 +423,92 @@
             50% { transform: translate(30px, 30px) rotate(180deg); }
             100% { transform: translate(0, 0) rotate(360deg); }
         }
+
+        .analysis-card {
+    grid-column: span 12;
+    grid-row: span 2;
+}
+
+.analysis-container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.analysis-text {
+    flex-grow: 1;
+    background: rgba(255, 255, 255, 0.7);
+    border-radius: 10px;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+    box-shadow: inset 0 0 10px rgba(0,0,0,0.05);
+    overflow-y: auto;
+    max-height: 200px;
+}
+
+.analysis-text p {
+    margin-bottom: 0.8rem;
+    line-height: 1.6;
+}
+
+.analysis-loading {
+    color: var(--text-light);
+    text-align: center;
+    font-style: italic;
+}
+
+.analysis-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.analysis-timestamp {
+    color: var(--text-light);
+    font-size: 0.9rem;
+}
+
+.analysis-refresh {
+    background: var(--accent);
+    color: white;
+    border: none;
+    border-radius: 20px;
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.analysis-refresh:hover {
+    background: var(--accent-dark);
+}
+
+.analysis-highlight {
+    font-weight: 500;
+    color: var(--accent-dark);
+}
+
+.analysis-alert {
+    color: var(--danger);
+    font-weight: 500;
+}
+
+.analysis-good {
+    color: var(--success);
+    font-weight: 500;
+}
+
+@media (max-width: 1200px) {
+    .analysis-card {
+        grid-column: span 6;
+    }
+}
+
+@media (max-width: 768px) {
+    .analysis-card {
+        grid-column: span 1;
+    }
+}
     </style>
 </head>
 <body>
@@ -543,6 +629,21 @@
             <div class="card-footer">
                 <span>Updated: <span id="water-updated">--:--</span></span>
                 <span>Change: <span id="water-change">--</span></span>
+            </div>
+        </div>
+        <div class="card analysis-card">
+            <div class="card-header">
+                <h3 class="card-title">Environmental Analysis</h3>
+                <div class="card-icon">🔍</div>
+            </div>
+            <div class="analysis-container">
+                <div class="analysis-text" id="analysis-text">
+                    <p class="analysis-loading">Analyzing environmental data...</p>
+                </div>
+                <div class="analysis-footer">
+                    <span class="analysis-timestamp">Last analysis: <span id="analysis-time">--:--</span></span>
+                    <button class="analysis-refresh" id="refresh-analysis">Refresh Analysis</button>
+                </div>
             </div>
         </div>
     </div>
@@ -1012,6 +1113,164 @@ function initDashboard() {
 
 // Run initialization
 window.addEventListener('DOMContentLoaded', initDashboard);
+
+
+// Analysis function to provide intelligent insights
+function generateEnvironmentalAnalysis(data) {
+    if (!data || 
+        (data.temperature === null && 
+         data.humidity === null && 
+         data.soil_moisture === null && 
+         data.rain_detected === null)) {
+        return "<p class='analysis-loading'>Waiting for sensor data to generate analysis...</p>";
+    }
+    
+    let analysis = [];
+    const currentTime = new Date();
+    const hour = currentTime.getHours();
+    const isDay = hour >= 6 && hour < 18;
+    
+    // Temperature analysis
+    if (data.temperature !== null) {
+        let tempAnalysis = "";
+        if (data.temperature > 30) {
+            tempAnalysis = `<p>The current temperature is <span class="analysis-highlight">${data.temperature.toFixed(1)}°C</span>, which is <span class="analysis-alert">significantly above the ideal range</span>. This may cause plant stress and increased water evaporation. Consider providing shade and increasing watering frequency.</p>`;
+        } else if (data.temperature > 25) {
+            tempAnalysis = `<p>The current temperature is <span class="analysis-highlight">${data.temperature.toFixed(1)}°C</span>, which is <span class="analysis-alert">slightly elevated</span> but within manageable range. Monitor plants for signs of heat stress, especially during peak sun hours.</p>`;
+        } else if (data.temperature > 15) {
+            tempAnalysis = `<p>The current temperature is <span class="analysis-highlight">${data.temperature.toFixed(1)}°C</span>, which is in the <span class="analysis-good">ideal range</span> for most plants. Growth conditions are optimal at this temperature.</p>`;
+        } else if (data.temperature > 5) {
+            tempAnalysis = `<p>The current temperature is <span class="analysis-highlight">${data.temperature.toFixed(1)}°C</span>, which is <span class="analysis-alert">cooler than optimal</span> for many plants. Growth may slow down but is still possible for cold-tolerant varieties.</p>`;
+        } else {
+            tempAnalysis = `<p>The current temperature is <span class="analysis-highlight">${data.temperature.toFixed(1)}°C</span>, which is <span class="analysis-alert">critically low</span>. Frost damage is possible. Consider protective measures if growing sensitive plants.</p>`;
+        }
+        analysis.push(tempAnalysis);
+    }
+    
+    // Humidity analysis
+    if (data.humidity !== null) {
+        let humidityAnalysis = "";
+        if (data.humidity > 85) {
+            humidityAnalysis = `<p>Current humidity is <span class="analysis-highlight">${data.humidity.toFixed(1)}%</span>, which is <span class="analysis-alert">very high</span>. This increases the risk of fungal diseases and mold. Consider improving air circulation and reducing overhead watering.</p>`;
+        } else if (data.humidity > 60) {
+            humidityAnalysis = `<p>Current humidity is <span class="analysis-highlight">${data.humidity.toFixed(1)}%</span>, which is <span class="analysis-good">good for most tropical plants</span> but may be high for desert species. This promotes healthy leaf development and reduces transpiration stress.</p>`;
+        } else if (data.humidity > 40) {
+            humidityAnalysis = `<p>Current humidity is <span class="analysis-highlight">${data.humidity.toFixed(1)}%</span>, which is in the <span class="analysis-good">ideal range</span> for most plants, providing a good balance between growth and disease prevention.</p>`;
+        } else {
+            humidityAnalysis = `<p>Current humidity is <span class="analysis-highlight">${data.humidity.toFixed(1)}%</span>, which is <span class="analysis-alert">low</span>. This may lead to increased water loss through transpiration. Consider misting sensitive plants or using a humidifier nearby.</p>`;
+        }
+        analysis.push(humidityAnalysis);
+    }
+    
+    // Soil moisture analysis
+    if (data.soil_moisture !== null) {
+        let soilAnalysis = "";
+        if (data.soil_moisture > 2500) {
+            soilAnalysis = `<p>Soil moisture reading is <span class="analysis-highlight">${data.soil_moisture}</span>, indicating <span class="analysis-alert">critically dry soil</span>. Immediate watering is recommended to prevent plant wilting and root damage.</p>`;
+        } else if (data.soil_moisture > 2000) {
+            soilAnalysis = `<p>Soil moisture reading is <span class="analysis-highlight">${data.soil_moisture}</span>, indicating <span class="analysis-alert">dry soil conditions</span>. Watering is recommended within the next 12-24 hours.</p>`;
+        } else if (data.soil_moisture > 1500) {
+            soilAnalysis = `<p>Soil moisture reading is <span class="analysis-highlight">${data.soil_moisture}</span>, indicating <span class="analysis-highlight">slightly dry soil</span>. Monitor conditions, especially if weather is hot or windy.</p>`;
+        } else if (data.soil_moisture > 1000) {
+            soilAnalysis = `<p>Soil moisture reading is <span class="analysis-highlight">${data.soil_moisture}</span>, indicating <span class="analysis-good">ideal moisture levels</span>. Soil has good moisture content while maintaining adequate aeration for root health.</p>`;
+        } else {
+            soilAnalysis = `<p>Soil moisture reading is <span class="analysis-highlight">${data.soil_moisture}</span>, indicating <span class="analysis-alert">very wet conditions</span>. Avoid additional watering to prevent root rot and oxygen deprivation.</p>`;
+        }
+        analysis.push(soilAnalysis);
+    }
+    
+    // Rain analysis
+    if (data.rain_detected !== null) {
+        let rainAnalysis = "";
+        if (data.rain_detected) {
+            if (data.rain_intensity && data.rain_intensity > 50) {
+                rainAnalysis = `<p><span class="analysis-alert">Heavy rainfall detected</span> (intensity: <span class="analysis-highlight">${data.rain_intensity.toFixed(1)}</span>). This may lead to soil erosion and nutrient leaching. Consider checking drainage systems and protecting sensitive plants.</p>`;
+            } else if (data.rain_intensity && data.rain_intensity > 20) {
+                rainAnalysis = `<p><span class="analysis-highlight">Moderate rainfall detected</span> (intensity: <span class="analysis-highlight">${data.rain_intensity.toFixed(1)}</span>). This provides good moisture for plants while not being too intense. Ideal for natural irrigation.</p>`;
+            } else {
+                rainAnalysis = `<p><span class="analysis-good">Light rainfall detected</span>. This gentle precipitation is excellent for plants as it allows slow absorption without soil compaction or runoff.</p>`;
+            }
+            
+            // Add irrigation recommendation
+            rainAnalysis += `<p>With natural rainfall occurring, <span class="analysis-good">automated irrigation should be paused</span> to prevent overwatering.</p>`;
+        } else {
+            if (isDay && data.temperature > 25 && data.humidity < 40 && data.soil_moisture > 1800) {
+                rainAnalysis = `<p>Currently <span class="analysis-highlight">no rainfall</span> with high temperature, low humidity, and drying soil. <span class="analysis-alert">Consider irrigation</span> to prevent plant stress, especially for shallow-rooted plants.</p>`;
+            } else if (data.soil_moisture > 2200) {
+                rainAnalysis = `<p>Currently <span class="analysis-highlight">no rainfall</span> with soil moisture readings indicating dry conditions. <span class="analysis-alert">Watering is recommended</span> based on soil moisture status.</p>`;
+            } else {
+                rainAnalysis = `<p>Currently <span class="analysis-highlight">no rainfall</span>, but soil moisture levels are adequate. No immediate irrigation needed.</p>`;
+            }
+        }
+        analysis.push(rainAnalysis);
+    }
+    
+    // Integrated analysis and recommendations
+    let integratedAnalysis = "<p><strong>Overall Assessment:</strong> ";
+    
+    // Determine overall garden/environment health
+    let stressPoints = 0;
+    if (data.temperature !== null && (data.temperature > 30 || data.temperature < 5)) stressPoints += 2;
+    else if (data.temperature !== null && (data.temperature > 28 || data.temperature < 10)) stressPoints += 1;
+    
+    if (data.humidity !== null && (data.humidity > 85 || data.humidity < 30)) stressPoints += 1;
+    
+    if (data.soil_moisture !== null && (data.soil_moisture > 2200 || data.soil_moisture < 800)) stressPoints += 2;
+    else if (data.soil_moisture !== null && (data.soil_moisture > 1800 || data.soil_moisture < 900)) stressPoints += 1;
+    
+    if (stressPoints >= 4) {
+        integratedAnalysis += `<span class="analysis-alert">Multiple environmental stressors detected</span>. Immediate attention recommended to prevent plant damage.</p>`;
+    } else if (stressPoints >= 2) {
+        integratedAnalysis += `<span class="analysis-highlight">Moderate stress conditions</span>. Some intervention may be needed to maintain optimal growing conditions.</p>`;
+    } else {
+        integratedAnalysis += `<span class="analysis-good">Environmental conditions are favorable</span> for healthy plant growth and development.</p>`;
+    }
+    
+    // Add time-specific recommendations
+    if (isDay) {
+        if (data.temperature !== null && data.temperature > 28 && data.humidity !== null && data.humidity < 40) {
+            integratedAnalysis += `<p><strong>Time-specific recommendation:</strong> Consider <span class="analysis-highlight">misting plants during mid-day</span> to reduce heat stress during peak sun hours.</p>`;
+        }
+    } else {
+        if (data.temperature !== null && data.temperature < 10) {
+            integratedAnalysis += `<p><strong>Time-specific recommendation:</strong> <span class="analysis-highlight">Cover sensitive plants</span> tonight to protect from potential cold damage.</p>`;
+        }
+    }
+    
+    analysis.push(integratedAnalysis);
+    
+    return analysis.join("");
+}
+
+// Function to update the analysis section
+function updateAnalysis() {
+    const analysisElement = document.getElementById('analysis-text');
+    const analysisTimeElement = document.getElementById('analysis-time');
+    
+    // Get the current sensor data
+    fetch('/sensor-data')
+        .then(response => response.json())
+        .then(data => {
+            // Generate analysis
+            const analysisContent = generateEnvironmentalAnalysis(data);
+            analysisElement.innerHTML = analysisContent;
+            
+            // Update timestamp
+            const currentTime = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+            analysisTimeElement.textContent = currentTime;
+        })
+        .catch(error => {
+            console.error('Error fetching data for analysis:', error);
+            analysisElement.innerHTML = "<p class='analysis-loading'>Error connecting to sensors. Please try again later.</p>";
+        });
+}
+
+// Add event listener for manual refresh
+document.getElementById('refresh-analysis').addEventListener('click', updateAnalysis);
+
+// Update analysis initially and at regular intervals
+updateAnalysis();
+setInterval(updateAnalysis, 30000); // Update every 30 seconds
     </script>
     </body>
     </html>
