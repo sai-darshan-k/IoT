@@ -529,7 +529,21 @@
             <div class="dashboard-status">System Online</div>
         </div>
     </div>
-
+    <div class="card analysis-card">
+        <div class="card-header">
+            <h3 class="card-title">Environmental Analysis</h3>
+            <div class="card-icon">🔍</div>
+        </div>
+        <div class="analysis-container">
+            <div class="analysis-text" id="analysis-text">
+                <p class="analysis-loading">Analyzing environmental data...</p>
+            </div>
+            <div class="analysis-footer">
+                <span class="analysis-timestamp">Last analysis: <span id="analysis-time">--:--</span></span>
+                <button class="analysis-refresh" id="refresh-analysis">Refresh Analysis</button>
+            </div>
+        </div>
+    </div>
     <div class="dashboard-grid">
         <div class="card temp-card">
             <div class="card-header">
@@ -629,21 +643,6 @@
             <div class="card-footer">
                 <span>Updated: <span id="water-updated">--:--</span></span>
                 <span>Change: <span id="water-change">--</span></span>
-            </div>
-        </div>
-        <div class="card analysis-card">
-            <div class="card-header">
-                <h3 class="card-title">Environmental Analysis</h3>
-                <div class="card-icon">🔍</div>
-            </div>
-            <div class="analysis-container">
-                <div class="analysis-text" id="analysis-text">
-                    <p class="analysis-loading">Analyzing environmental data...</p>
-                </div>
-                <div class="analysis-footer">
-                    <span class="analysis-timestamp">Last analysis: <span id="analysis-time">--:--</span></span>
-                    <button class="analysis-refresh" id="refresh-analysis">Refresh Analysis</button>
-                </div>
             </div>
         </div>
     </div>
