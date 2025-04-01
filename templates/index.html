@@ -947,42 +947,43 @@
         }
     }
 
-    function updateRainStatus(isRainDetected) {
-        const rainStatus = document.getElementById('rain-status');
-        const rainImage = document.getElementById('rain-image');
-        const currentHour = new Date().getHours();
-        const currentTime = new Date();
+    function updateRainStatus(rainDetected) {
+    const rainStatus = document.getElementById('rain-status');
+    const rainImage = document.getElementById('rain-image');
+    const currentHour = new Date().getHours();
+    const currentTime = new Date();
 
-        if (isRainDetected) {
-            rainStatus.innerHTML = 'Rain Detected';
-            rainStatus.className = 'rain-status rain-active';
-            rainImage.innerHTML = '<img src="https://media.tenor.com/YefQKTdi3hUAAAAj/rafsdesign-rafsdesigns.gif" alt="Rain" width="120" height="120">';
-            
-            // Track rain events
-            if (historyData.rainStartTime === null) {
-                historyData.rainStartTime = currentTime;
-                historyData.rainEvents++;
-                document.getElementById('rain-day-count').textContent = historyData.rainEvents;
-            }
+    // Check rain_detected value, which is a string from the Arduino
+    if (rainDetected === "Rain Detected") {
+        rainStatus.innerHTML = 'Rain Detected';
+        rainStatus.className = 'rain-status rain-active';
+        rainImage.innerHTML = '<img src="https://media.tenor.com/YefQKTdi3hUAAAAj/rafsdesign-rafsdesigns.gif" alt="Rain" width="120" height="120">';
+        
+        // Track rain events
+        if (historyData.rainStartTime === null) {
+            historyData.rainStartTime = currentTime;
+            historyData.rainEvents++;
+            document.getElementById('rain-day-count').textContent = historyData.rainEvents;
+        }
+    } else { // "No Rain" or any other value
+        rainStatus.innerHTML = 'No Rain';
+        rainStatus.className = 'rain-status rain-inactive';
+        
+        if (currentHour >= 6 && currentHour < 18) {
+            rainImage.innerHTML = '<img src="https://media1.tenor.com/m/gUKy0QmrNHIAAAAC/sun-sunlight.gif" alt="Sunlight" width="120" height="120">';
         } else {
-            rainStatus.innerHTML = 'No Rain';
-            rainStatus.className = 'rain-status rain-inactive';
-            
-            if (currentHour >= 6 && currentHour < 18) {
-                rainImage.innerHTML = '<img src="https://media1.tenor.com/m/gUKy0QmrNHIAAAAC/sun-sunlight.gif" alt="Sunlight" width="120" height="120">';
-            } else {
-                rainImage.innerHTML = '<img src="https://media.tenor.com/DTIl6DWhrZwAAAAj/moon-spacedoodles.gif" alt="Moonlight" width="120" height="120">';
-            }
-            
-            // Calculate rain duration if it was raining
-            if (historyData.rainStartTime !== null) {
-                const duration = Math.round((currentTime - historyData.rainStartTime) / 60000); // in minutes
-                historyData.lastRainDuration = duration;
-                document.getElementById('rain-duration').textContent = duration + ' min';
-                historyData.rainStartTime = null;
-            }
+            rainImage.innerHTML = '<img src="https://media.tenor.com/DTIl6DWhrZwAAAAj/moon-spacedoodles.gif" alt="Moonlight" width="120" height="120">';
+        }
+        
+        // Calculate rain duration if it was raining
+        if (historyData.rainStartTime !== null) {
+            const duration = Math.round((currentTime - historyData.rainStartTime) / 60000); // in minutes
+            historyData.lastRainDuration = duration;
+            document.getElementById('rain-duration').textContent = duration + ' min';
+            historyData.rainStartTime = null;
         }
     }
+}
 
     function updateCharts(time, data) {
         // Update rain intensity chart
