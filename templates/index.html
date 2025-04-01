@@ -1150,7 +1150,6 @@ function initDashboard() {
 window.addEventListener('DOMContentLoaded', initDashboard);
 
 
-// Analysis function to provide intelligent insights
 function generateEnvironmentalAnalysis(data) {
     if (!data || 
         (data.temperature === null && 
@@ -1165,7 +1164,7 @@ function generateEnvironmentalAnalysis(data) {
     const hour = currentTime.getHours();
     const isDay = hour >= 6 && hour < 18;
     
-    // Temperature analysis
+    // Temperature analysis (unchanged)
     if (data.temperature !== null) {
         let tempAnalysis = "";
         if (data.temperature > 30) {
@@ -1182,7 +1181,7 @@ function generateEnvironmentalAnalysis(data) {
         analysis.push(tempAnalysis);
     }
     
-    // Humidity analysis
+    // Humidity analysis (unchanged)
     if (data.humidity !== null) {
         let humidityAnalysis = "";
         if (data.humidity > 85) {
@@ -1197,7 +1196,7 @@ function generateEnvironmentalAnalysis(data) {
         analysis.push(humidityAnalysis);
     }
     
-    // Soil moisture analysis
+    // Soil moisture analysis (unchanged)
     if (data.soil_moisture !== null) {
         let soilAnalysis = "";
         if (data.soil_moisture > 2500) {
@@ -1214,36 +1213,42 @@ function generateEnvironmentalAnalysis(data) {
         analysis.push(soilAnalysis);
     }
     
-    // Rain analysis
+    // Rain analysis (updated)
     if (data.rain_detected !== null) {
         let rainAnalysis = "";
-        if (data.rain_detected) {
-            if (data.rain_intensity && data.rain_intensity > 50) {
-                rainAnalysis = `<p><span class="analysis-alert">Heavy rainfall detected</span> (intensity: <span class="analysis-highlight">${data.rain_intensity.toFixed(1)}</span>). This may lead to soil erosion and nutrient leaching. Consider checking drainage systems and protecting sensitive plants.</p>`;
-            } else if (data.rain_intensity && data.rain_intensity > 20) {
-                rainAnalysis = `<p><span class="analysis-highlight">Moderate rainfall detected</span> (intensity: <span class="analysis-highlight">${data.rain_intensity.toFixed(1)}</span>). This provides good moisture for plants while not being too intense. Ideal for natural irrigation.</p>`;
+        if (data.rain_detected === "Rain Detected") {
+            // Rain is detected when rain_intensity < 2000
+            if (data.rain_intensity !== null) {
+                // Invert intensity logic: lower values mean heavier rain
+                const intensityLevel = 4095 - data.rain_intensity; // Assuming 4095 is max analog value for your sensor
+                if (data.rain_intensity < 500) {
+                    rainAnalysis = `<p><span class="analysis-alert">Heavy rainfall detected</span> (intensity reading: <span class="analysis-highlight">${data.rain_intensity}</span>). This indicates significant precipitation, which may lead to soil erosion and nutrient leaching. Consider checking drainage systems and protecting sensitive plants.</p>`;
+                } else if (data.rain_intensity < 1000) {
+                    rainAnalysis = `<p><span class="analysis-highlight">Moderate rainfall detected</span> (intensity reading: <span class="analysis-highlight">${data.rain_intensity}</span>). This provides good moisture for plants while not being too intense. Ideal for natural irrigation.</p>`;
+                } else {
+                    rainAnalysis = `<p><span class="analysis-good">Light rainfall detected</span> (intensity reading: <span class="analysis-highlight">${data.rain_intensity}</span>). This gentle precipitation is excellent for plants as it allows slow absorption without soil compaction or runoff.</p>`;
+                }
             } else {
-                rainAnalysis = `<p><span class="analysis-good">Light rainfall detected</span>. This gentle precipitation is excellent for plants as it allows slow absorption without soil compaction or runoff.</p>`;
+                rainAnalysis = `<p><span class="analysis-good">Rainfall detected</span>. This natural precipitation benefits plants by providing moisture. No intensity data available for further analysis.</p>`;
             }
             
             // Add irrigation recommendation
             rainAnalysis += `<p>With natural rainfall occurring, <span class="analysis-good">automated irrigation should be paused</span> to prevent overwatering.</p>`;
-        } else {
+        } else { // "No Rain"
             if (isDay && data.temperature > 25 && data.humidity < 40 && data.soil_moisture > 1800) {
-                rainAnalysis = `<p>Currently <span class="analysis-highlight">no rainfall</span> with high temperature, low humidity, and drying soil. <span class="analysis-alert">Consider irrigation</span> to prevent plant stress, especially for shallow-rooted plants.</p>`;
+                rainAnalysis = `<p>Currently <span class="analysis-highlight">no rainfall</span> (intensity reading: <span class="analysis-highlight">${data.rain_intensity || '--'}</span>) with high temperature, low humidity, and drying soil. <span class="analysis-alert">Consider irrigation</span> to prevent plant stress, especially for shallow-rooted plants.</p>`;
             } else if (data.soil_moisture > 2200) {
-                rainAnalysis = `<p>Currently <span class="analysis-highlight">no rainfall</span> with soil moisture readings indicating dry conditions. <span class="analysis-alert">Watering is recommended</span> based on soil moisture status.</p>`;
+                rainAnalysis = `<p>Currently <span class="analysis-highlight">no rainfall</span> (intensity reading: <span class="analysis-highlight">${data.rain_intensity || '--'}</span>) with soil moisture readings indicating dry conditions. <span class="analysis-alert">Watering is recommended</span> based on soil moisture status.</p>`;
             } else {
-                rainAnalysis = `<p>Currently <span class="analysis-highlight">no rainfall</span>, but soil moisture levels are adequate. No immediate irrigation needed.</p>`;
+                rainAnalysis = `<p>Currently <span class="analysis-highlight">no rainfall</span> (intensity reading: <span class="analysis-highlight">${data.rain_intensity || '--'}</span>), but soil moisture levels are adequate. No immediate irrigation needed.</p>`;
             }
         }
         analysis.push(rainAnalysis);
     }
     
-    // Integrated analysis and recommendations
+    // Integrated analysis and recommendations (unchanged)
     let integratedAnalysis = "<p><strong>Overall Assessment:</strong> ";
     
-    // Determine overall garden/environment health
     let stressPoints = 0;
     if (data.temperature !== null && (data.temperature > 30 || data.temperature < 5)) stressPoints += 2;
     else if (data.temperature !== null && (data.temperature > 28 || data.temperature < 10)) stressPoints += 1;
@@ -1261,7 +1266,6 @@ function generateEnvironmentalAnalysis(data) {
         integratedAnalysis += `<span class="analysis-good">Environmental conditions are favorable</span> for healthy plant growth and development.</p>`;
     }
     
-    // Add time-specific recommendations
     if (isDay) {
         if (data.temperature !== null && data.temperature > 28 && data.humidity !== null && data.humidity < 40) {
             integratedAnalysis += `<p><strong>Time-specific recommendation:</strong> Consider <span class="analysis-highlight">misting plants during mid-day</span> to reduce heat stress during peak sun hours.</p>`;
