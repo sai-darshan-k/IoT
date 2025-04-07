@@ -1311,5 +1311,51 @@ document.getElementById('refresh-analysis').addEventListener('click', updateAnal
 updateAnalysis();
 setInterval(updateAnalysis, 30000); // Update every 30 seconds
     </script>
+    <script>
+        if ('serviceWorker' in navigator && 'PushManager' in window) {
+          navigator.serviceWorker.register('/service-worker.js')
+            .then(registration => {
+              console.log('Service Worker registered');
+              return Notification.requestPermission();
+            })
+            .then(permission => {
+              if (permission === 'granted') {
+                subscribeUserToPush();
+              }
+            })
+            .catch(error => console.error('Service Worker Error:', error));
+        }
+      
+        function subscribeUserToPush() {
+          navigator.serviceWorker.ready.then(registration => {
+            const vapidPublicKey = 'MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEVs/yMz9J3jg34cHaB8scL12mP9e4n3zQinyaBxWCYhL7fil9UFo+HI0gRdtK+Ak8wIOiSXaLZTsWPwhqsZQPFA==';
+            const convertedVapidKey = urlBase64ToUint8Array(vapidPublicKey);
+      
+            registration.pushManager.subscribe({
+              userVisibleOnly: true,
+              applicationServerKey: convertedVapidKey
+            }).then(subscription => {
+              fetch('/subscribe', {
+                method: 'POST',
+                body: JSON.stringify(subscription),
+                headers: { 'Content-Type': 'application/json' }
+              });
+            });
+          });
+        }
+      
+        function urlBase64ToUint8Array(base64String) {
+          const padding = '='.repeat((4 - base64String.length % 4) % 4);
+          const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+          const rawData = window.atob(base64);
+          const outputArray = new Uint8Array(rawData.length);
+          for (let i = 0; i < rawData.length; ++i) {
+            outputArray[i] = rawData.charCodeAt(i);
+          }
+          return outputArray;
+        }
+      
+        // Your existing functions (updateAnalysis, initDashboard, etc.) remain unchanged
+      </script>
     </body>
     </html>
