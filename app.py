@@ -19,7 +19,6 @@ sensor_data = {
 subscriptions = []
 data_lock = threading.Lock()
 
-# VAPID keys
 VAPID_PUBLIC_KEY = "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEVs/yMz9J3jg34cHaB8scL12mP9e4n3zQinyaBxWCYhL7fil9UFo+HI0gRdtK+Ak8wIOiSXaLZTsWPwhqsZQPFA=="
 VAPID_PRIVATE_KEY = "MIGHAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBG0wawIBAQQghJNqg05NbTpXSsfunHYxCehltrDMPtVfQ6qv2ElJjh6hRANCAARWz/IzP0neODfhwdoHyxwvXaY/17iffNCKfJoHFYJiEvt+KX1QWj4cjSBF20r4CTzAg6JJdotlOxY/CGqxlA8U"
 
@@ -51,7 +50,7 @@ def send_push_notification(analysis_text):
                 subscription_info=subscription,
                 data=json.dumps({"body": analysis_text}),
                 vapid_private_key=VAPID_PRIVATE_KEY,
-                vapid_claims={"sub": "mailto:saidarshan9569@gmail.com"}  # Replace with your email
+                vapid_claims={"sub": "mailto:saidarshan9569@gmail.com"}  # Your email
             )
         except Exception as e:
             print(f"Failed to send notification: {e}")
@@ -64,7 +63,7 @@ def update_sensor_data():
             with data_lock:
                 data = request.get_json()
                 sensor_data.update(data)
-                sensor_data["last_update"] = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                sensor_data["last_update"] = datetime.datetime.now().strftime("%Y-% eingm-%d %H:%M:%S")
                 analysis_text = generate_environmental_analysis(sensor_data)
                 send_push_notification(analysis_text)
             return jsonify({"message": "Data updated", "timestamp": sensor_data["last_update"]}), 200
@@ -85,4 +84,4 @@ def index():
     return render_template('index.html')
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=True, ssl_context='adhoc')
+    app.run(host='0.0.0.0', port=5000, debug=True)  # No ssl_context for Vercel proxy
