@@ -1312,7 +1312,7 @@ updateAnalysis();
 setInterval(updateAnalysis, 30000); // Update every 30 seconds
     </script>
     <script>
-        if ('serviceWorker' in navigator && 'PushManager' in window) {
+     if ('serviceWorker' in navigator && 'PushManager' in window) {
   navigator.serviceWorker.register('/service-worker.js')
     .then(registration => {
       console.log('Service Worker registered');
@@ -1335,7 +1335,7 @@ function subscribeUserToPush() {
       userVisibleOnly: true,
       applicationServerKey: convertedVapidKey
     }).then(subscription => {
-      fetch('/subscribe', {
+      fetch('https://iot-delta-vert.vercel.app/api/subscribe', {
         method: 'POST',
         body: JSON.stringify(subscription),
         headers: { 'Content-Type': 'application/json' }
@@ -1356,8 +1356,6 @@ function urlBase64ToUint8Array(base64String) {
   }
   return outputArray;
 }
-      
-        // Your existing functions (updateAnalysis, initDashboard, etc.) remain unchanged
       </script>
     </body>
     </html>
