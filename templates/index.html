@@ -576,6 +576,14 @@
             </div>
         </div>
     </div>
+    <div class="notification-banner" id="notification-permission-banner">
+        <div class="notification-message">
+            <i class="notification-icon">🔔</i>
+            <span>Get alerts about plant conditions on your mobile</span>
+        </div>
+        <button class="notification-btn" id="notification-subscribe-btn">Enable Notifications</button>
+        <button class="notification-close" id="notification-close-btn">×</button>
+    </div>
     <div class="dashboard-grid">
         <div class="card temp-card">
             <div class="card-header">
@@ -1311,51 +1319,222 @@ document.getElementById('refresh-analysis').addEventListener('click', updateAnal
 updateAnalysis();
 setInterval(updateAnalysis, 30000); // Update every 30 seconds
     </script>
+<!-- Add this CSS to your stylesheet or in a style tag in the head -->
+<style>
+    .notification-banner {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        background: linear-gradient(to right, #2ecc71, #3498db);
+        color: white;
+        padding: 12px 20px;
+        margin-bottom: 20px;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        animation: slideIn 0.5s ease-out;
+    }
+    
+    @keyframes slideIn {
+        from { transform: translateY(-50px); opacity: 0; }
+        to { transform: translateY(0); opacity: 1; }
+    }
+    
+    .notification-message {
+        display: flex;
+        align-items: center;
+        flex-grow: 1;
+    }
+    
+    .notification-icon {
+        font-size: 20px;
+        margin-right: 10px;
+    }
+    
+    .notification-btn {
+        background-color: rgba(255,255,255,0.2);
+        border: 2px solid white;
+        color: white;
+        padding: 8px 16px;
+        border-radius: 20px;
+        cursor: pointer;
+        font-weight: bold;
+        transition: all 0.3s ease;
+        margin: 0 15px;
+    }
+    
+    .notification-btn:hover {
+        background-color: white;
+        color: #2ecc71;
+    }
+    
+    .notification-close {
+        background: none;
+        border: none;
+        color: white;
+        font-size: 20px;
+        cursor: pointer;
+        padding: 0 5px;
+    }
+    
+    /* For mobile responsiveness */
+    @media (max-width: 768px) {
+        .notification-banner {
+            flex-direction: column;
+            padding: 15px;
+        }
+        
+        .notification-message {
+            margin-bottom: 10px;
+            justify-content: center;
+            text-align: center;
+        }
+        
+        .notification-btn {
+            margin: 10px 0;
+            width: 100%;
+        }
+        
+        .notification-close {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+        }
+    }
+    </style>
+    
+    <!-- Add this JavaScript to your script section or in a separate file -->
     <script>
-if ('serviceWorker' in navigator && 'PushManager' in window) {
-  navigator.serviceWorker.register('/service-worker.js')
-    .then(registration => {
-      console.log('Service Worker registered');
-      return Notification.requestPermission();
-    })
-    .then(permission => {
-      if (permission === 'granted') {
-        subscribeUserToPush();
-      }
-    })
-    .catch(error => console.error('Service Worker Error:', error));
-}
-
-function subscribeUserToPush() {
-  navigator.serviceWorker.ready.then(registration => {
-    const vapidPublicKey = 'MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEVs/yMz9J3jg34cHaB8scL12mP9e4n3zQinyaBxWCYhL7fil9UFo+HI0gRdtK+Ak8wIOiSXaLZTsWPwhqsZQPFA==';
-    const convertedVapidKey = urlBase64ToUint8Array(vapidPublicKey);
-
-    registration.pushManager.subscribe({
-      userVisibleOnly: true,
-      applicationServerKey: convertedVapidKey
-    }).then(subscription => {
-      fetch('/api/subscribe', {  // Vercel endpoint
-        method: 'POST',
-        body: JSON.stringify(subscription),
-        headers: { 'Content-Type': 'application/json' }
-      }).then(response => response.json())
-        .then(data => console.log('Subscribed:', data))
-        .catch(err => console.error('Subscription failed:', err));
-    });
-  });
-}
-
-function urlBase64ToUint8Array(base64String) {
-  const padding = '='.repeat((4 - base64String.length % 4) % 4);
-  const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
-  const rawData = window.atob(base64);
-  const outputArray = new Uint8Array(rawData.length);
-  for (let i = 0; i < rawData.length; ++i) {
-    outputArray[i] = rawData.charCodeAt(i);
-  }
-  return outputArray;
-}
-      </script>
+    // Check if service workers are supported
+    if ('serviceWorker' in navigator && 'PushManager' in window) {
+        let swRegistration = null;
+        
+        // Function to update UI based on notification permission status
+        function updateNotificationUI() {
+            const permissionBanner = document.getElementById('notification-permission-banner');
+            const subscribeBtn = document.getElementById('notification-subscribe-btn');
+            
+            // Get current permission state
+            if (Notification.permission === 'granted') {
+                // Hide the banner if permission is already granted
+                permissionBanner.style.display = 'none';
+            } else if (Notification.permission === 'denied') {
+                subscribeBtn.textContent = 'Notifications Blocked';
+                subscribeBtn.disabled = true;
+                subscribeBtn.style.opacity = '0.5';
+            }
+        }
+        
+        // Handle the subscribe button click
+        document.getElementById('notification-subscribe-btn').addEventListener('click', async () => {
+            try {
+                // Request permission
+                const permission = await Notification.requestPermission();
+                
+                if (permission === 'granted') {
+                    // Register service worker if not already registered
+                    if (!swRegistration) {
+                        swRegistration = await navigator.serviceWorker.register('/service-worker.js');
+                    }
+                    
+                    // Get the VAPID public key from server
+                    const response = await fetch('/vapid-public-key');
+                    const vapidData = await response.json();
+                    const publicKey = vapidData.publicKey;
+                    
+                    // Convert the public key to the format the browser needs
+                    function urlBase64ToUint8Array(base64String) {
+                        const padding = '='.repeat((4 - base64String.length % 4) % 4);
+                        const base64 = (base64String + padding)
+                            .replace(/-/g, '+')
+                            .replace(/_/g, '/');
+                        
+                        const rawData = window.atob(base64);
+                        const outputArray = new Uint8Array(rawData.length);
+                        
+                        for (let i = 0; i < rawData.length; ++i) {
+                            outputArray[i] = rawData.charCodeAt(i);
+                        }
+                        return outputArray;
+                    }
+                    
+                    // Subscribe to push service
+                    const options = {
+                        userVisibleOnly: true,
+                        applicationServerKey: urlBase64ToUint8Array(publicKey)
+                    };
+                    
+                    const subscription = await swRegistration.pushManager.subscribe(options);
+                    
+                    // Send the subscription to the server
+                    await fetch('/subscribe', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(subscription)
+                    });
+                    
+                    // Hide the banner and show success message
+                    document.getElementById('notification-permission-banner').style.display = 'none';
+                    
+                    // Show a temporary success message
+                    const successMessage = document.createElement('div');
+                    successMessage.className = 'notification-banner success';
+                    successMessage.innerHTML = `
+                        <div class="notification-message">
+                            <i class="notification-icon">✅</i>
+                            <span>Notifications enabled! You'll receive alerts about plant conditions.</span>
+                        </div>
+                    `;
+                    document.body.insertBefore(successMessage, document.querySelector('.dashboard-grid'));
+                    setTimeout(() => {
+                        successMessage.style.opacity = '0';
+                        setTimeout(() => successMessage.remove(), 500);
+                    }, 3000);
+                    
+                } else {
+                    // Update UI for denied state
+                    updateNotificationUI();
+                }
+            } catch (error) {
+                console.error('Error subscribing to notifications:', error);
+                alert('There was an error enabling notifications. Please try again later.');
+            }
+        });
+        
+        // Handle banner close button
+        document.getElementById('notification-close-btn').addEventListener('click', () => {
+            document.getElementById('notification-permission-banner').style.display = 'none';
+            
+            // Store preference in localStorage so we don't show it again for some time
+            localStorage.setItem('notificationBannerClosed', Date.now());
+        });
+        
+        // Check if we should show the banner (not shown if recently closed)
+        const lastClosed = localStorage.getItem('notificationBannerClosed');
+        if (lastClosed && Date.now() - Number(lastClosed) < 86400000) { // 24 hours
+            document.getElementById('notification-permission-banner').style.display = 'none';
+        }
+        
+        // Register service worker
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('/service-worker.js')
+                .then(registration => {
+                    swRegistration = registration;
+                    updateNotificationUI();
+                })
+                .catch(error => {
+                    console.error('Service Worker registration failed:', error);
+                });
+        });
+        
+        // Update UI based on current state
+        updateNotificationUI();
+    } else {
+        // Hide the banner if push notifications are not supported
+        document.getElementById('notification-permission-banner').style.display = 'none';
+        console.warn('Push notifications not supported by this browser');
+    }
+    </script>
     </body>
     </html>
