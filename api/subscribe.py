@@ -1,7 +1,7 @@
 import json
 from http import HTTPStatus
 
-subscriptions = []  # In-memory; use a DB for persistence
+subscriptions = []  # In-memory; resets on serverless restart
 
 def handler(req):
     if req.method == 'POST':

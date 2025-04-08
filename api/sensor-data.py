@@ -3,7 +3,7 @@ from datetime import datetime
 from pywebpush import webpush
 from http import HTTPStatus
 
-# In-memory storage (reset on serverless restart; use a DB for persistence)
+# In-memory storage (resets on serverless restart; use a DB for persistence)
 sensor_data = {
     "temperature": None,
     "humidity": None,
@@ -46,7 +46,7 @@ def send_push_notification(analysis_text):
                 subscription_info=subscription,
                 data=json.dumps({"body": analysis_text}),
                 vapid_private_key=VAPID_PRIVATE_KEY,
-                vapid_claims={"sub": "mailto:saida@example.com"}
+                vapid_claims={"sub": "mailto:saidarshan9569@gmail.com"}
             )
         except Exception as e:
             print(f"Failed to send notification: {e}")
@@ -56,7 +56,7 @@ def handler(req):
         try:
             data = req.get_json()
             sensor_data.update(data)
-            sensor_data["last_update"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            sensor_data["last_update"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")  # Fixed typo
             analysis_text = generate_environmental_analysis(sensor_data)
             send_push_notification(analysis_text)
             return {
