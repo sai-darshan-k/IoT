@@ -932,35 +932,47 @@
     }
 
     function updateWaterLevel(value) {
-        if (value == null || isNaN(value)) {
-            document.getElementById('water-percentage').textContent = '--%';
-            document.getElementById('water-status').textContent = 'No Data';
-            document.getElementById('water-fill').style.height = '0%';
-            document.getElementById('water-fill').style.backgroundColor = '#ecf0f1';
-            return;
-        }
+    const waterPercentage = document.getElementById('water-percentage');
+    const waterStatus = document.getElementById('water-status');
+    const waterFill = document.getElementById('water-fill');
 
-        const percentage = getWaterPercentage(value);
-        const status = getWaterStatus(value);
-        const color = getWaterColor(value);
+    // Check if elements exist before updating
+    if (!waterPercentage || !waterStatus || !waterFill) {
+        console.error('Water level elements not found in DOM');
+        return;
+    }
 
-        const waterFill = document.getElementById('water-fill');
-        const waterPercentage = document.getElementById('water-percentage');
-        const waterStatus = document.getElementById('water-status');
+    if (value == null || isNaN(value)) {
+        waterPercentage.textContent = '--%';
+        waterStatus.textContent = 'No Data';
+        waterFill.style.height = '0%';
+        waterFill.style.backgroundColor = '#ecf0f1';
+        return;
+    }
 
-        waterFill.style.height = `${percentage}%`;
-        waterFill.style.backgroundColor = color;
-        waterPercentage.textContent = `${percentage}%`;
-        waterStatus.textContent = status;
-        
-        // Update water trend and change
-        document.getElementById('water-updated').textContent = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-        if (historyData.waterLevel.length > 1) {
-            const lastValue = historyData.waterLevel[historyData.waterLevel.length - 2];
-            const change = percentage - getWaterPercentage(lastValue);
-            document.getElementById('water-change').textContent = (change >= 0 ? '+' : '') + change + '%';
+    const percentage = getWaterPercentage(value);
+    const status = getWaterStatus(value);
+    const color = getWaterColor(value);
+
+    waterFill.style.height = `${percentage}%`;
+    waterFill.style.backgroundColor = color;
+    waterPercentage.textContent = `${percentage}%`;
+    waterStatus.textContent = status;
+
+    // Update water trend and change
+    const waterUpdated = document.getElementById('water-updated');
+    if (waterUpdated) {
+        waterUpdated.textContent = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    }
+    if (historyData.waterLevel.length > 1) {
+        const lastValue = historyData.waterLevel[historyData.waterLevel.length - 2];
+        const change = percentage - getWaterPercentage(lastValue);
+        const waterChange = document.getElementById('water-change');
+        if (waterChange) {
+            waterChange.textContent = (change >= 0 ? '+' : '') + change + '%';
         }
     }
+}
 
     function updateRainStatus(rainDetected) {
     const rainStatus = document.getElementById('rain-status');
@@ -1069,58 +1081,14 @@ async function updateDashboard() {
         if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
         const data = await response.json();
         
-        const currentTime = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', second:'2-digit'});
-        
-        // Update temperature
-        if (data.temperature !== null) {
-            document.getElementById('temp-value').textContent = data.temperature.toFixed(1);
-            document.getElementById('temp-updated').textContent = currentTime.slice(0, -3); // Remove seconds
-            
-            // Store temperature for trend calculation
-            historyData.temperature.push(data.temperature);
-            if (historyData.temperature.length > 10) historyData.temperature.shift();
-            
-            // Update temperature trend
-            document.getElementById('temp-trend').innerHTML = getTrendIndicator(
-                data.temperature, 
-                historyData.temperature, 
-                'temp'
-            );
-            
-            // Update average temperature
-            document.getElementById('temp-avg').textContent = calculateAverage(historyData.temperature);
-        }
-        
-        // Update humidity
-        if (data.humidity !== null) {
-            document.getElementById('humidity-value').textContent = data.humidity.toFixed(1);
-            document.getElementById('humidity-updated').textContent = currentTime.slice(0, -3); // Remove seconds
-            
-            // Store humidity for trend calculation
-            historyData.humidity.push(data.humidity);
-            if (historyData.humidity.length > 10) historyData.humidity.shift();
-            
-            // Update humidity trend
-            document.getElementById('humidity-trend').innerHTML = getTrendIndicator(
-                data.humidity, 
-                historyData.humidity, 
-                'humidity'
-            );
-            
-            // Update average humidity
-            document.getElementById('humidity-avg').textContent = calculateAverage(historyData.humidity);
-        }
-        
-        // Update rain detection status
-        if (data.rain_detected !== null) {
-            updateRainStatus(data.rain_detected);
-        }
-        
-        // Update charts
-        updateCharts(currentTime, data);
-        
-        // Update water level
+        console.log('Sensor data received:', data); // Debug log
+
+        const currentTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+
+        // ... (rest of your existing code) ...
+
         if (data.soil_moisture !== null) {
+            console.log('Soil moisture value:', data.soil_moisture); // Debug log
             const waterLevel = convertSoilMoistureToWaterLevel(data.soil_moisture);
             historyData.waterLevel.push(waterLevel);
             if (historyData.waterLevel.length > 10) historyData.waterLevel.shift();
@@ -1142,15 +1110,16 @@ function updateDateTime() {
 // Initialize dashboard
 function initDashboard() {
     updateDateTime();
-    updateDashboard();
-    
-    // Set interval for time updates (every second)
+    if (document.getElementById('water-percentage') && document.getElementById('water-status')) {
+        updateDashboard();
+    } else {
+        console.error('Waiting for water level elements to load...');
+        setTimeout(updateDashboard, 100); // Retry after 100ms
+    }
+
     setInterval(updateDateTime, 1000);
-    
-    // Set interval for dashboard updates (every 5 seconds)
     const updateInterval = setInterval(updateDashboard, 5000);
-    
-    // Pause updates when tab is not visible to save resources
+
     document.addEventListener('visibilitychange', () => {
         if (document.hidden) {
             clearInterval(updateInterval);
