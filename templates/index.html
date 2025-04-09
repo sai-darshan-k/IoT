@@ -675,25 +675,11 @@
                     <div class="water-status" id="water-status">No Data</div>
                 </div>
             </div>
-            <div class="card motor-card">
-                <div class="card-header">
-                    <h3 class="card-title">Motor Control</h3>
-                    <div class="card-icon">⚙️</div>
-                </div>
-                <div class="motor-control-container">
-                    <div class="motor-status" id="motor-status">Unknown</div>
-                    <label class="switch">
-                        <input type="checkbox" id="motor-toggle">
-                        <span class="slider round"></span>
-                    </label>
-                    <div class="motor-last-control" id="motor-last-control">Last action: --</div>
-                </div>
-                <div class="card-footer">
-                    <span>Updated: <span id="motor-updated">--:--</span></span>
-                    <span>Control: <span id="motor-control-source">--</span></span>
-                </div>
+            
+            <div class="card-footer">
+                <span>Updated: <span id="water-updated">--:--</span></span>
+                <span>Change: <span id="water-change">--</span></span>
             </div>
-
         </div>
     </div>
 
@@ -932,47 +918,35 @@
     }
 
     function updateWaterLevel(value) {
-    const waterPercentage = document.getElementById('water-percentage');
-    const waterStatus = document.getElementById('water-status');
-    const waterFill = document.getElementById('water-fill');
+        if (value == null || isNaN(value)) {
+            document.getElementById('water-percentage').textContent = '--%';
+            document.getElementById('water-status').textContent = 'No Data';
+            document.getElementById('water-fill').style.height = '0%';
+            document.getElementById('water-fill').style.backgroundColor = '#ecf0f1';
+            return;
+        }
 
-    // Check if elements exist before updating
-    if (!waterPercentage || !waterStatus || !waterFill) {
-        console.error('Water level elements not found in DOM');
-        return;
-    }
+        const percentage = getWaterPercentage(value);
+        const status = getWaterStatus(value);
+        const color = getWaterColor(value);
 
-    if (value == null || isNaN(value)) {
-        waterPercentage.textContent = '--%';
-        waterStatus.textContent = 'No Data';
-        waterFill.style.height = '0%';
-        waterFill.style.backgroundColor = '#ecf0f1';
-        return;
-    }
+        const waterFill = document.getElementById('water-fill');
+        const waterPercentage = document.getElementById('water-percentage');
+        const waterStatus = document.getElementById('water-status');
 
-    const percentage = getWaterPercentage(value);
-    const status = getWaterStatus(value);
-    const color = getWaterColor(value);
-
-    waterFill.style.height = `${percentage}%`;
-    waterFill.style.backgroundColor = color;
-    waterPercentage.textContent = `${percentage}%`;
-    waterStatus.textContent = status;
-
-    // Update water trend and change
-    const waterUpdated = document.getElementById('water-updated');
-    if (waterUpdated) {
-        waterUpdated.textContent = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    }
-    if (historyData.waterLevel.length > 1) {
-        const lastValue = historyData.waterLevel[historyData.waterLevel.length - 2];
-        const change = percentage - getWaterPercentage(lastValue);
-        const waterChange = document.getElementById('water-change');
-        if (waterChange) {
-            waterChange.textContent = (change >= 0 ? '+' : '') + change + '%';
+        waterFill.style.height = `${percentage}%`;
+        waterFill.style.backgroundColor = color;
+        waterPercentage.textContent = `${percentage}%`;
+        waterStatus.textContent = status;
+        
+        // Update water trend and change
+        document.getElementById('water-updated').textContent = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+        if (historyData.waterLevel.length > 1) {
+            const lastValue = historyData.waterLevel[historyData.waterLevel.length - 2];
+            const change = percentage - getWaterPercentage(lastValue);
+            document.getElementById('water-change').textContent = (change >= 0 ? '+' : '') + change + '%';
         }
     }
-}
 
     function updateRainStatus(rainDetected) {
     const rainStatus = document.getElementById('rain-status');
@@ -1081,14 +1055,58 @@ async function updateDashboard() {
         if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
         const data = await response.json();
         
-        console.log('Sensor data received:', data); // Debug log
-
-        const currentTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-
-        // ... (rest of your existing code) ...
-
+        const currentTime = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', second:'2-digit'});
+        
+        // Update temperature
+        if (data.temperature !== null) {
+            document.getElementById('temp-value').textContent = data.temperature.toFixed(1);
+            document.getElementById('temp-updated').textContent = currentTime.slice(0, -3); // Remove seconds
+            
+            // Store temperature for trend calculation
+            historyData.temperature.push(data.temperature);
+            if (historyData.temperature.length > 10) historyData.temperature.shift();
+            
+            // Update temperature trend
+            document.getElementById('temp-trend').innerHTML = getTrendIndicator(
+                data.temperature, 
+                historyData.temperature, 
+                'temp'
+            );
+            
+            // Update average temperature
+            document.getElementById('temp-avg').textContent = calculateAverage(historyData.temperature);
+        }
+        
+        // Update humidity
+        if (data.humidity !== null) {
+            document.getElementById('humidity-value').textContent = data.humidity.toFixed(1);
+            document.getElementById('humidity-updated').textContent = currentTime.slice(0, -3); // Remove seconds
+            
+            // Store humidity for trend calculation
+            historyData.humidity.push(data.humidity);
+            if (historyData.humidity.length > 10) historyData.humidity.shift();
+            
+            // Update humidity trend
+            document.getElementById('humidity-trend').innerHTML = getTrendIndicator(
+                data.humidity, 
+                historyData.humidity, 
+                'humidity'
+            );
+            
+            // Update average humidity
+            document.getElementById('humidity-avg').textContent = calculateAverage(historyData.humidity);
+        }
+        
+        // Update rain detection status
+        if (data.rain_detected !== null) {
+            updateRainStatus(data.rain_detected);
+        }
+        
+        // Update charts
+        updateCharts(currentTime, data);
+        
+        // Update water level
         if (data.soil_moisture !== null) {
-            console.log('Soil moisture value:', data.soil_moisture); // Debug log
             const waterLevel = convertSoilMoistureToWaterLevel(data.soil_moisture);
             historyData.waterLevel.push(waterLevel);
             if (historyData.waterLevel.length > 10) historyData.waterLevel.shift();
@@ -1110,16 +1128,15 @@ function updateDateTime() {
 // Initialize dashboard
 function initDashboard() {
     updateDateTime();
-    if (document.getElementById('water-percentage') && document.getElementById('water-status')) {
-        updateDashboard();
-    } else {
-        console.error('Waiting for water level elements to load...');
-        setTimeout(updateDashboard, 100); // Retry after 100ms
-    }
-
+    updateDashboard();
+    
+    // Set interval for time updates (every second)
     setInterval(updateDateTime, 1000);
+    
+    // Set interval for dashboard updates (every 5 seconds)
     const updateInterval = setInterval(updateDashboard, 5000);
-
+    
+    // Pause updates when tab is not visible to save resources
     document.addEventListener('visibilitychange', () => {
         if (document.hidden) {
             clearInterval(updateInterval);
@@ -1295,188 +1312,6 @@ document.getElementById('refresh-analysis').addEventListener('click', updateAnal
 updateAnalysis();
 setInterval(updateAnalysis, 30000); // Update every 30 seconds
     </script>
-   <style>
-    .motor-card {
-        background: linear-gradient(135deg, #34495e, #2c3e50);
-        color: white;
-    }
-    
-    .motor-control-container {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        padding: 1.5rem;
-        gap: 1rem;
-    }
-    
-    .motor-status {
-        font-size: 1.4rem;
-        font-weight: bold;
-        margin-bottom: 0.5rem;
-    }
-    
-    .motor-status.on {
-        color: #2ecc71;
-    }
-    
-    .motor-status.off {
-        color: #e74c3c;
-    }
-    
-    .motor-last-control {
-        font-size: 0.85rem;
-        opacity: 0.8;
-        margin-top: 0.5rem;
-    }
-    
-    /* Toggle Switch */
-    .switch {
-        position: relative;
-        display: inline-block;
-        width: 60px;
-        height: 34px;
-    }
-    
-    .switch input {
-        opacity: 0;
-        width: 0;
-        height: 0;
-    }
-    
-    .slider {
-        position: absolute;
-        cursor: pointer;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background-color: #ccc;
-        transition: .4s;
-    }
-    
-    .slider:before {
-        position: absolute;
-        content: "";
-        height: 26px;
-        width: 26px;
-        left: 4px;
-        bottom: 4px;
-        background-color: white;
-        transition: .4s;
-    }
-    
-    input:checked + .slider {
-        background-color: #2ecc71;
-    }
-    
-    input:focus + .slider {
-        box-shadow: 0 0 1px #2ecc71;
-    }
-    
-    input:checked + .slider:before {
-        transform: translateX(26px);
-    }
-    
-    .slider.round {
-        border-radius: 34px;
-    }
-    
-    .slider.round:before {
-        border-radius: 50%;
-    }
-</style>
-
-<!-- Add this JavaScript at the end before closing script tag -->
-<script>
-// Motor control functionality
-let motorControlSource = "None";
-let motorLastUpdate = new Date();
-
-async function updateMotorStatus() {
-    try {
-        const response = await fetch('/motor-control');
-        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-        const data = await response.json();
-        
-        const motorStatus = document.getElementById('motor-status');
-        const motorToggle = document.getElementById('motor-toggle');
-        const motorUpdated = document.getElementById('motor-updated');
-        const motorControlSource = document.getElementById('motor-control-source');
-        const motorLastControl = document.getElementById('motor-last-control');
-        
-        // Update the toggle without triggering the change event
-        const oldOnchange = motorToggle.onchange;
-        motorToggle.onchange = null;
-        motorToggle.checked = data.status === "ON";
-        setTimeout(() => { motorToggle.onchange = oldOnchange; }, 10);
-        
-        // Update the status text and style
-        motorStatus.textContent = data.status;
-        motorStatus.className = 'motor-status ' + (data.status === "ON" ? 'on' : 'off');
-        
-        // Update the last updated time
-        if (data.last_update) {
-            const updateTime = new Date(data.last_update).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-            motorUpdated.textContent = updateTime;
-        }
-    } catch (error) {
-        console.error('Error fetching motor status:', error);
-    }
-}
-
-async function toggleMotor(status) {
-    try {
-        const response = await fetch('/motor-control', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ motor_status: status ? "ON" : "OFF" }),
-        });
-        
-        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-        
-        // Update UI elements
-        const data = await response.json();
-        document.getElementById('motor-status').textContent = data.status;
-        document.getElementById('motor-status').className = 'motor-status ' + (data.status === "ON" ? 'on' : 'off');
-        
-        // Update control source and last action
-        motorControlSource = "Web Interface";
-        motorLastUpdate = new Date();
-        document.getElementById('motor-control-source').textContent = motorControlSource;
-        document.getElementById('motor-last-control').textContent = 'Last action: ' + motorLastUpdate.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-        document.getElementById('motor-updated').textContent = motorLastUpdate.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-        
-    } catch (error) {
-        console.error('Error toggling motor:', error);
-        // Revert the toggle state if there was an error
-        document.getElementById('motor-toggle').checked = !status;
-    }
-}
-
-// Initialize motor toggle functionality
-function initMotorControl() {
-    const motorToggle = document.getElementById('motor-toggle');
-    
-    // Add event listener to the toggle
-    motorToggle.addEventListener('change', function() {
-        toggleMotor(this.checked);
-    });
-    
-    // Initial fetch of motor status
-    updateMotorStatus();
-    
-    // Periodically update the motor status
-    setInterval(updateMotorStatus, 5000);
-}
-
-// Modify the window load event to include motor control initialization
-window.addEventListener('DOMContentLoaded', function() {
-    initDashboard();
-    initMotorControl();
-});
-</script>
+   
     </body>
     </html>

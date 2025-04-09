@@ -14,11 +14,6 @@ sensor_data = {
     "last_update": None
 }
 
-motor_status = {
-    "status": "OFF",
-    "last_update": None
-}
-
 data_lock = threading.Lock()
 
 @app.route('/sensor-data', methods=['POST', 'GET'])
@@ -36,22 +31,6 @@ def update_sensor_data():
     elif request.method == 'GET':
         with data_lock:
             return jsonify(sensor_data), 200
-
-@app.route('/motor-control', methods=['POST', 'GET'])
-def motor_control():
-    global motor_status
-    if request.method == 'POST':
-        if request.is_json:
-            with data_lock:
-                data = request.get_json()
-                if 'motor_status' in data:
-                    motor_status["status"] = data['motor_status']
-                    motor_status["last_update"] = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-            return jsonify({"message": "Motor status updated", "status": motor_status["status"]}), 200
-        return jsonify({"error": "Invalid JSON"}), 400
-    elif request.method == 'GET':
-        with data_lock:
-            return jsonify(motor_status), 200
 
 @app.route('/')
 def index():
