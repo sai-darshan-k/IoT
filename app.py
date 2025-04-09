@@ -11,8 +11,7 @@ sensor_data = {
     "rain_detected": None,
     "soil_moisture": None,
     "water_layer": None,
-    "last_update": None,
-    "pump_status": "OFF"  # Add pump status tracking
+    "last_update": None
 }
 
 data_lock = threading.Lock()
@@ -32,19 +31,6 @@ def update_sensor_data():
     elif request.method == 'GET':
         with data_lock:
             return jsonify(sensor_data), 200
-
-@app.route('/pump-control', methods=['POST'])
-def pump_control():
-    global sensor_data
-    if request.is_json:
-        data = request.get_json()
-        if 'action' in data:
-            with data_lock:
-                # Update local pump status
-                sensor_data["pump_status"] = data['action']
-            return jsonify({"message": f"Pump {data['action']} command sent", "status": data['action']}), 200
-        return jsonify({"error": "Missing 'action' parameter"}), 400
-    return jsonify({"error": "Invalid JSON"}), 400
 
 @app.route('/')
 def index():
