@@ -675,6 +675,15 @@
                     <div class="water-status" id="water-status">No Data</div>
                 </div>
             </div>
+
+                <!-- Add Motor Control Button -->
+    <div class="motor-control">
+        <div class="motor-status">Motor: <span id="motor-status">--</span></div>
+        <label class="toggle-switch">
+            <input type="checkbox" id="motor-toggle">
+            <span class="toggle-slider"></span>
+        </label>
+    </div>
             
             <div class="card-footer">
                 <span>Updated: <span id="water-updated">--:--</span></span>
@@ -1312,6 +1321,166 @@ document.getElementById('refresh-analysis').addEventListener('click', updateAnal
 updateAnalysis();
 setInterval(updateAnalysis, 30000); // Update every 30 seconds
     </script>
-   
+   <style>
+    /* Motor Control Toggle Switch */
+.motor-control {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 15px 0;
+    padding: 5px 10px;
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+}
+
+.motor-status {
+    font-size: 1rem;
+    font-weight: 500;
+}
+
+.toggle-switch {
+    position: relative;
+    display: inline-block;
+    width: 60px;
+    height: 30px;
+}
+
+.toggle-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.toggle-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: .4s;
+    border-radius: 34px;
+}
+
+.toggle-slider:before {
+    position: absolute;
+    content: "";
+    height: 22px;
+    width: 22px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    transition: .4s;
+    border-radius: 50%;
+}
+
+input:checked + .toggle-slider {
+    background-color: #2196F3;
+}
+
+input:checked + .toggle-slider:before {
+    transform: translateX(30px);
+}
+
+#motor-status.on {
+    color: #2ecc71;
+    font-weight: bold;
+}
+
+#motor-status.off {
+    color: #e74c3c;
+}
+    </style>
+    <script>
+        // Add this to your existing JavaScript
+
+// Motor control functions
+let motorStatus = "OFF"; // Track motor status locally
+
+// Initialize motor status on page load
+async function initializeMotorStatus() {
+    try {
+        const response = await fetch('/motor-control');
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+        const data = await response.json();
+        updateMotorUI(data.motor_status);
+    } catch (error) {
+        console.error('Error fetching motor status:', error);
+    }
+}
+
+// Update UI based on motor status
+function updateMotorUI(status) {
+    const motorStatusElement = document.getElementById('motor-status');
+    const motorToggle = document.getElementById('motor-toggle');
+    
+    motorStatus = status;
+    
+    if (status === "ON") {
+        motorStatusElement.textContent = "ON";
+        motorStatusElement.className = "on";
+        motorToggle.checked = true;
+    } else {
+        motorStatusElement.textContent = "OFF";
+        motorStatusElement.className = "off";
+        motorToggle.checked = false;
+    }
+}
+
+// Send motor control command to server
+async function toggleMotor(status) {
+    try {
+        const response = await fetch('/motor-control', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ motor_status: status })
+        });
+        
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+        const data = await response.json();
+        
+        // Update UI after successful server update
+        updateMotorUI(status);
+        console.log(`Motor turned ${status}`);
+    } catch (error) {
+        console.error('Error toggling motor:', error);
+        // Revert UI if there was an error
+        updateMotorUI(motorStatus);
+    }
+}
+
+// Add event listener for motor toggle
+document.addEventListener('DOMContentLoaded', function() {
+    const motorToggle = document.getElementById('motor-toggle');
+    if (motorToggle) {
+        motorToggle.addEventListener('change', function() {
+            const newStatus = this.checked ? "ON" : "OFF";
+            toggleMotor(newStatus);
+        });
+    }
+    
+    // Initialize motor status
+    initializeMotorStatus();
+    
+    // Check for motor status updates every 5 seconds
+    setInterval(async function() {
+        try {
+            const response = await fetch('/motor-control');
+            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+            const data = await response.json();
+            
+            // Only update UI if status has changed
+            if (data.motor_status !== motorStatus) {
+                updateMotorUI(data.motor_status);
+            }
+        } catch (error) {
+            console.error('Error checking motor status:', error);
+        }
+    }, 5000);
+});
+    </script>
     </body>
     </html>
