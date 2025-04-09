@@ -661,24 +661,33 @@
                 <h3 class="card-title">Water Level</h3>
                 <div class="card-icon">🌊</div>
             </div>
-            <div class="water-container">
-                <div class="water-circle">
-                    <div class="water-fill" id="water-fill">
-                        <div class="water-wave"></div>
-                    </div>
-                </div>
-                <div class="tree-container" id="tree-container">
-                    <img src="{{ url_for('static', filename='plant4.png') }}" alt="Water Image" class="water-image">
-                </div>
-                <div class="water-text">
-                    <div class="water-percentage" id="water-percentage">--</div>
-                    <div class="water-status" id="water-status">No Data</div>
-                </div>
-            </div>
-            <div class="card-footer">
-                <span>Updated: <span id="water-updated">--:--</span></span>
-                <span>Change: <span id="water-change">--</span></span>
-            </div>
+            <!-- Inside the water-card div, after the water-container -->
+<div class="water-container">
+    <div class="water-circle">
+        <div class="water-fill" id="water-fill">
+            <div class="water-wave"></div>
+        </div>
+    </div>
+    <div class="tree-container" id="tree-container">
+        <img src="{{ url_for('static', filename='plant4.png') }}" alt="Water Image" class="water-image">
+    </div>
+    <div class="water-text">
+        <div class="water-percentage" id="water-percentage">--</div>
+        <div class="water-status" id="water-status">No Data</div>
+    </div>
+</div>
+<!-- Add motor control section here -->
+<div class="motor-control">
+    <label class="switch">
+        <input type="checkbox" id="motor-toggle" onchange="toggleMotor()">
+        <span class="slider round"></span>
+    </label>
+    <span class="motor-status" id="motor-status">Motor: Unknown</span>
+</div>
+<div class="card-footer">
+    <span>Updated: <span id="water-updated">--:--</span></span>
+    <span>Change: <span id="water-change">--</span></span>
+</div>
         </div>
     </div>
 
@@ -1311,6 +1320,131 @@ document.getElementById('refresh-analysis').addEventListener('click', updateAnal
 updateAnalysis();
 setInterval(updateAnalysis, 30000); // Update every 30 seconds
     </script>
-   
+   <style>
+    .motor-control {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-top: 10px;
+}
+
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 60px;
+    height: 34px;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: .4s;
+    border-radius: 34px;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 26px;
+    width: 26px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    transition: .4s;
+    border-radius: 50%;
+}
+
+input:checked + .slider {
+    background-color: #2ecc71;
+}
+
+input:checked + .slider:before {
+    transform: translateX(26px);
+}
+
+.motor-status {
+    font-size: 14px;
+    font-weight: bold;
+}
+    </style>
+    <script>
+        // Fetch motor status initially and update UI
+async function updateMotorStatus() {
+    try {
+        const response = await fetch('/motor-control');
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+        const data = await response.json();
+        const motorToggle = document.getElementById('motor-toggle');
+        const motorStatus = document.getElementById('motor-status');
+        
+        motorToggle.checked = data.motor_status === "ON";
+        motorStatus.textContent = `Motor: ${data.motor_status}`;
+    } catch (error) {
+        console.error('Error fetching motor status:', error);
+        document.getElementById('motor-status').textContent = 'Motor: Error';
+    }
+}
+
+// Toggle motor state via the web interface
+async function toggleMotor() {
+    const motorToggle = document.getElementById('motor-toggle');
+    const newState = motorToggle.checked ? 'ON' : 'OFF';
+    
+    try {
+        const response = await fetch('/motor-control', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ motor_status: newState }),
+        });
+        
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+        const data = await response.json();
+        document.getElementById('motor-status').textContent = `Motor: ${data.motor_status}`;
+    } catch (error) {
+        console.error('Error toggling motor:', error);
+        document.getElementById('motor-status').textContent = 'Motor: Error';
+        motorToggle.checked = !motorToggle.checked; // Revert toggle on error
+    }
+}
+
+// Update initDashboard to include motor status updates
+function initDashboard() {
+    updateDateTime();
+    updateDashboard();
+    updateMotorStatus(); // Add this line
+    
+    setInterval(updateDateTime, 1000);
+    const updateInterval = setInterval(() => {
+        updateDashboard();
+        updateMotorStatus(); // Add this line
+    }, 5000);
+    
+    document.addEventListener('visibilitychange', () => {
+        if (document.hidden) {
+            clearInterval(updateInterval);
+        } else {
+            updateDashboard();
+            updateMotorStatus(); // Add this line
+            setInterval(() => {
+                updateDashboard();
+                updateMotorStatus(); // Add this line
+            }, 5000);
+        }
+    });
+}
+        </script>
     </body>
     </html>
