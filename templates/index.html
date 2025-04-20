@@ -685,17 +685,8 @@
     <script>
     // Constants for water level thresholds
     const WATER_LEVELS = {
-        THRESHOLDS: {
-            VERY_WET: 2500,
-            SHALLOW_WET: 1700,
-            MODERATELY_WET: 1300
-        },
-        PERCENTAGES: {
-            VERY_WET: 0,
-            SHALLOW_WET: 40,
-            MODERATELY_WET: 75,
-            DEEP_WET: 95
-        }
+        MAX_SOIL_MOISTURE: 3000, // Maximum soil moisture value (dry)
+        MIN_SOIL_MOISTURE: 500   // Minimum soil moisture value (wet)
     };
 
     // Store historical data for trends
@@ -854,24 +845,30 @@
 
     // Helper functions
     function getWaterStatus(value) {
-        if (value >= WATER_LEVELS.THRESHOLDS.VERY_WET) return 'Dry';
-        if (value >= WATER_LEVELS.THRESHOLDS.SHALLOW_WET) return 'Shallow Wet';
-        if (value >= WATER_LEVELS.THRESHOLDS.MODERATELY_WET) return 'Moderately Wet';
-        return 'Deep Wet';
+        if (value > 2500) return 'Very Dry';
+        if (value > 2000) return 'Dry';
+        if (value > 1500) return 'Slightly Dry';
+        if (value > 1000) return 'Moist';
+        return 'Wet';
     }
 
-    function getWaterColor(value) {
-        if (value >= WATER_LEVELS.THRESHOLDS.VERY_WET) return '#3498db';
-        if (value >= WATER_LEVELS.THRESHOLDS.SHALLOW_WET) return '#2980b9';
-        if (value >= WATER_LEVELS.THRESHOLDS.MODERATELY_WET) return '#1f618d';
-        return '#154360';
+    function getWaterColor(percentage) {
+        // Interpolate between colors based on percentage
+        // From dry (#3498db) to wet (#154360)
+        const dryColor = { r: 52, g: 152, b: 219 }; // #3498db
+        const wetColor = { r: 21, g: 67, b: 96 };  // #154360
+        const ratio = percentage / 100;
+        const r = Math.round(dryColor.r + (wetColor.r - dryColor.r) * ratio);
+        const g = Math.round(dryColor.g + (wetColor.g - dryColor.g) * ratio);
+        const b = Math.round(dryColor.b + (wetColor.b - dryColor.b) * ratio);
+        return `rgb(${r}, ${g}, ${b})`;
     }
 
     function getWaterPercentage(value) {
-        if (value >= WATER_LEVELS.THRESHOLDS.VERY_WET) return WATER_LEVELS.PERCENTAGES.VERY_WET;
-        if (value >= WATER_LEVELS.THRESHOLDS.SHALLOW_WET) return WATER_LEVELS.PERCENTAGES.SHALLOW_WET;
-        if (value >= WATER_LEVELS.THRESHOLDS.MODERATELY_WET) return WATER_LEVELS.PERCENTAGES.MODERATELY_WET;
-        return WATER_LEVELS.PERCENTAGES.DEEP_WET;
+        // Map soil moisture to percentage (0% = very dry, 100% = very wet)
+        const clampedValue = Math.min(Math.max(value, WATER_LEVELS.MIN_SOIL_MOISTURE), WATER_LEVELS.MAX_SOIL_MOISTURE);
+        const percentage = ((WATER_LEVELS.MAX_SOIL_MOISTURE - clampedValue) / (WATER_LEVELS.MAX_SOIL_MOISTURE - WATER_LEVELS.MIN_SOIL_MOISTURE)) * 100;
+        return Math.round(percentage);
     }
 
     function getSoilStatus(value) {
@@ -927,7 +924,7 @@
 
         const percentage = getWaterPercentage(value);
         const status = getWaterStatus(value);
-        const color = getWaterColor(value);
+        const color = getWaterColor(percentage);
 
         const waterFill = document.getElementById('water-fill');
         const waterPercentage = document.getElementById('water-percentage');
@@ -943,7 +940,7 @@
         if (historyData.waterLevel.length > 1) {
             const lastValue = historyData.waterLevel[historyData.waterLevel.length - 2];
             const change = percentage - getWaterPercentage(lastValue);
-            document.getElementById('water-change').textContent = (change >= 0 ? '+' : '') + change + '%';
+            document.getElementById('water-change').textContent = (change >= 0 ? '+' : '') + change.toFixed(1) + '%';
         }
     }
 
@@ -1000,7 +997,7 @@
             series.push(data.rain_intensity);
             categories.push(time);
             
-            rainIntensityChart.updateOptions({
+averagedIntensityChart.updateOptions({
                 series: [{
                     data: series
                 }],
@@ -1164,7 +1161,7 @@ function generateEnvironmentalAnalysis(data) {
     const hour = currentTime.getHours();
     const isDay = hour >= 6 && hour < 18;
     
-    // Temperature analysis (unchanged)
+    // Temperature analysis
     if (data.temperature !== null) {
         let tempAnalysis = "";
         if (data.temperature > 30) {
@@ -1181,7 +1178,7 @@ function generateEnvironmentalAnalysis(data) {
         analysis.push(tempAnalysis);
     }
     
-    // Humidity analysis (unchanged)
+    // Humidity analysis
     if (data.humidity !== null) {
         let humidityAnalysis = "";
         if (data.humidity > 85) {
@@ -1196,7 +1193,7 @@ function generateEnvironmentalAnalysis(data) {
         analysis.push(humidityAnalysis);
     }
     
-    // Soil moisture analysis (unchanged)
+    // Soil moisture analysis
     if (data.soil_moisture !== null) {
         let soilAnalysis = "";
         if (data.soil_moisture > 2500) {
@@ -1213,7 +1210,7 @@ function generateEnvironmentalAnalysis(data) {
         analysis.push(soilAnalysis);
     }
     
-    // Rain analysis (updated)
+    // Rain analysis
     if (data.rain_detected !== null) {
         let rainAnalysis = "";
         if (data.rain_detected === "Rain Detected") {
@@ -1246,7 +1243,7 @@ function generateEnvironmentalAnalysis(data) {
         analysis.push(rainAnalysis);
     }
     
-    // Integrated analysis and recommendations (unchanged)
+    // Integrated analysis and recommendations
     let integratedAnalysis = "<p><strong>Overall Assessment:</strong> ";
     
     let stressPoints = 0;
