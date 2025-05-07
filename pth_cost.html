@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agriculture IoT Solutions Pricing</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .slide {
+            width: 960px;
+            height: 540px;
+            background: linear-gradient(135deg, #f0f7f0, #ffffff);
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        .header {
+            background: linear-gradient(90deg, #2c5e2e, #3a7a3c);
+            color: white;
+            padding: 10px 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 3px solid #1e401f;
+        }
+        h1 {
+            margin: 0;
+            font-size: 24px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+        }
+        .content {
+            display: flex;
+            padding: 10px;
+            flex: 1;
+            gap: 10px;
+        }
+        .column {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .card {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.08);
+            overflow: hidden;
+            flex: 1;
+        }
+        .card-header {
+            background: linear-gradient(90deg, #2c5e2e, #3a7a3c);
+            color: white;
+            padding: 6px 15px;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        .card-header.optional {
+            background: linear-gradient(90deg, #4a824c, #5a9a5c);
+        }
+        .card-header.summary {
+            background: linear-gradient(90deg, #1e401f, #2a5a2c);
+            font-size: 16px;
+        }
+        .card-body {
+            padding: 8px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 17px;
+        }
+        th, td {
+            padding: 3px 5px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+        th {
+            font-weight: 600;
+            background-color: #f0f7f0;
+            color: #2c5e2e;
+        }
+        .footer {
+            padding: 5px 25px;
+            font-size: 12px;
+            color: #4a4a4a;
+            background-color: #e9f2e9;
+            display: flex;
+            justify-content: space-between;
+            border-top: 1px solid #c9e4c9;
+        }
+        .highlight {
+            font-weight: bold;
+            color: #2c5e2e;
+        }
+        .summary-table td {
+            padding: 5px;
+            font-size: 12px;
+        }
+        .farmer-types {
+            font-weight: bold;
+            background-color: #f0f7f0;
+            padding: 4px;
+            color: #1e401f;
+            text-align: center;
+            border-radius: 4px;
+            margin-top: 4px;
+            margin-bottom: 4px;
+            font-size: 12px;
+        }
+        .focus-farmer {
+            background-color: #eaf7ea;
+            border-left: 4px solid #2c5e2e;
+        }
+        .badge {
+            display: inline-block;
+            padding: 1px 5px;
+            border-radius: 10px;
+            font-size: 9px;
+            font-weight: bold;
+            background-color: #2c5e2e;
+            color: white;
+            margin-left: 3px;
+        }
+        .subsidy-note {
+            color: #2c5e2e;
+            margin-top: 5px;
+            font-size: 10px;
+            text-align: center;
+        }
+        .download-btn {
+            margin-top: 10px;
+            padding: 10px 20px;
+            background-color: transparent;
+            border: 2px solid #2c5e2e;
+            color: #2c5e2e;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .download-btn:hover {
+            background-color: #2c5e2e;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="slide" id="slide">
+        <div class="header">
+            <h1>Smart Agriculture IoT Solutions</h1>
+            <div style="font-size: 14px;">Affordable Farm Monitoring & Automation</div>
+        </div>
+        
+        <div class="content">
+            <div class="column">
+                <!-- Mandatory Components Card -->
+                <div class="card">
+                    <div class="card-header">Mandatory Components</div>
+                    <div class="card-body">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th width="45%">Component/Service</th>
+                                    <th width="25%">Type</th>
+                                    <th width="30%">Cost (INR)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Soil Moisture Sensor</td>
+                                    <td>Hardware</td>
+                                    <td>₹200</td>
+                                </tr>
+                                <tr>
+                                    <td>DHT22 (Temp/Humidity)</td>
+                                    <td>Hardware</td>
+                                    <td>₹150</td>
+                                </tr>
+                                <tr>
+                                    <td>Rain Sensor</td>
+                                    <td>Hardware</td>
+                                    <td>₹100</td>
+                                </tr>
+                                <tr>
+                                    <td>ESP32 with Board</td>
+                                    <td>Hardware</td>
+                                    <td>₹500</td>
+                                </tr>
+                                <tr>
+                                    <td>Relay</td>
+                                    <td>Hardware</td>
+                                    <td>₹500</td>
+                                </tr>
+                                <tr>
+                                    <td>Contactor</td>
+                                    <td>Hardware</td>
+                                    <td>₹1,500</td>
+                                </tr>
+                                <tr>
+                                    <td>Pole & Top Sheet</td>
+                                    <td>Hardware</td>
+                                    <td>₹400</td>
+                                </tr>
+                                <tr>
+                                    <td>GSM Module</td>
+                                    <td>Hardware</td>
+                                    <td>₹500</td>
+                                </tr>
+                                <tr>
+                                    <td>Contingency</td>
+                                    <td>Hardware</td>
+                                    <td>₹1,050</td>
+                                </tr>
+                                <tr>
+                                    <td>SIM Data Plan</td>
+                                    <td>Monthly</td>
+                                    <td>₹100/month</td>
+                                </tr>
+                                <tr>
+                                    <td>Service & Maintenance</td>
+                                    <td>Monthly</td>
+                                    <td>₹50/month</td>
+                                </tr>
+                                <tr>
+                                    <td>Leaf Disease Diagnosis</td>
+                                    <td>Software</td>
+                                    <td>Included</td>
+                                </tr>
+                                <tr>
+                                    <td>Cloud Platform</td>
+                                    <td>Software</td>
+                                    <td>Included</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="column">
+                <!-- Optional Components Card -->
+                <div class="card" style="flex: 0.55;">
+                    <div class="card-header optional">Optional Add-ons</div>
+                    <div class="card-body">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th width="50%">Component/Service</th>
+                                    <th width="50%">Cost (INR)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Solar Panel</td>
+                                    <td>₹2,000 - ₹2,500</td>
+                                </tr>
+                                <tr>
+                                    <td>Battery</td>
+                                    <td>₹1,500 - ₹2,000</td>
+                                </tr>
+                                <tr>
+                                    <td>Camera</td>
+                                    <td>₹2,000 - ₹2,500</td>
+                                </tr>
+                                <tr>
+                                    <td>Wind Sensor</td>
+                                    <td>₹3,200</td>
+                                </tr>
+                                <tr>
+                                    <td>Rain Gauge</td>
+                                    <td>₹5,000</td>
+                                </tr>
+                                <tr>
+                                    <td>Wall-Mounted Display</td>
+                                    <td>₹2,000</td>
+                                </tr>
+                                <tr>
+                                    <td>Advanced Analytics</td>
+                                    < aline="center">₹500/year</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <!-- Summary Card -->
+                <div class="card" style="flex: 0.45;">
+                    <div class="card-header summary">Cost Summary</div>
+                    <div class="card-body">
+                        <table class="summary-table">
+                            <tr>
+                                <td width="60%"><b>One-Time Hardware:</b></td>
+                                <td width="40%">₹5,000</td>
+                            </tr>
+                            <tr>
+                                <td><b>Monthly Subscription:</b></td>
+                                <td>₹150/month</td>
+                            </tr>
+                            <tr>
+                                <td><b>Annual Subscription:</b></td>
+                                <td>₹1,800</td>
+                            </tr>
+                            <tr>
+                                <td><b>Complete First Year:</b></td>
+                                <td class="highlight">₹6,800</td>
+                            </tr>
+                        </table>
+                        
+                        <div class="farmer-types">Full Package by Farmer Category</div>
+                        <table class="summary-table">
+                            <tr class="focus-farmer">
+                                <td width coarser="60%">Marginal Farmers: <span class="badge">80%</span></td>
+                                <td width="40%" class="highlight">₹12,300</td>
+                            </tr>
+                            <tr class="focus-farmer">
+                                <td>Small Farmers: <span class="badge">80%</span></td>
+                                <td class="highlight">₹15,800</td>
+                            </tr>
+                            <tr>
+                                <td>Large Farmers:</td>
+                                <td>₹22,000</td>
+                            </tr>
+                        </table>
+                        
+                        <div class="subsidy-note">
+                            PM-KUSUM subsidies (₹2,576–4,294) available for eligible farmers
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <div><b>Target Audience:</b> 80% of Indian farmers are Marginal & Small</div>
+            <div><b>Contact:</b> info@smartfarm.in | +91 98765-43210</div>
+        </div>
+    </div>
+
+    <!-- Download Button -->
+    <button class="download-btn" onclick="downloadSlide()">Download as JPG</button>
+
+    <!-- Include html2canvas library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script>
+        function downloadSlide() {
+            const slide = document.getElementById('slide');
+            html2canvas(slide, {
+                scale: 2, // Increase resolution for better quality
+                useCORS: true // Handle cross-origin issues if any
+            }).then(canvas => {
+                // Create a link element for download
+                const link = document.createElement('a');
+                link.download = 'Smart_Agriculture_IoT_Solutions.jpg';
+                link.href = canvas.toDataURL('image/jpeg', 0.9); // JPEG format with 90% quality
+                link.click();
+            }).catch(error => {
+                console.error('Error generating image:', error);
+                alert('Failed to download image. Please try again.');
+            });
+        }
+    </script>
+</body>
+</html>

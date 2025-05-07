@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agricultural IoT Solutions - Economies of Scale Analysis</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+        
+        :root {
+            --primary-color: #2c7744;
+            --secondary-color: #f0f7f1;
+            --accent-color: #5fb878;
+            --accent-light: #e8f5ec;
+            --text-dark: #2e3a37;
+            --text-light: #666666;
+            --border-radius: 12px;
+            --box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+            --transition: all 0.3s ease;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f9fafb;
+            color: var(--text-dark);
+            line-height: 1.5;
+        }
+        
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            background: linear-gradient(145deg, #ffffff, #f8f9fa);
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            overflow: hidden;
+            padding: 20px;
+            aspect-ratio: 16 / 9;
+        }
+        
+        .page-title {
+            text-align: center;
+            margin: 0 0 20px 0;
+            color: var(--primary-color);
+            font-size: 24px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .subtitle {
+            text-align: center;
+            margin: 0 0 25px 0;
+            color: var(--text-light);
+            font-size: 16px;
+            font-weight: 400;
+        }
+
+        .analysis-section {
+            margin-bottom: 20px;
+        }
+        
+        .section-title {
+            color: var(--primary-color);
+            margin-bottom: 15px;
+            font-size: 18px;
+            font-weight: 600;
+            border-bottom: 2px solid var(--accent-color);
+            padding-bottom: 5px;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+        
+        thead {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        th, td {
+            padding: 10px 15px;
+            text-align: left;
+            border: 1px solid #ddd;
+        }
+        
+        th {
+            font-weight: 600;
+        }
+        
+        tbody tr:nth-child(even) {
+            background-color: var(--accent-light);
+        }
+        
+        tbody tr:hover {
+            background-color: #e6f0e9;
+        }
+        
+        .highlight {
+            background-color: #fff5e6 !important;
+            font-weight: 500;
+        }
+        
+        .highlight td {
+            border-top: 2px solid #ffc107;
+            border-bottom: 2px solid #ffc107;
+        }
+
+        .profit {
+            color: #28a745;
+            font-weight: 600;
+        }
+        
+        .loss {
+            color: #dc3545;
+            font-weight: 600;
+        }
+
+        .break-even {
+            color: #fd7e14;
+            font-weight: 600;
+        }
+        
+        .notes {
+            font-size: 14px;
+            margin-top: 25px;
+            padding: 15px;
+            background-color: var(--secondary-color);
+            border-radius: var(--border-radius);
+            border-left: 4px solid var(--accent-color);
+        }
+        
+        .notes p {
+            margin-bottom: 8px;
+        }
+        
+        .notes ul {
+            margin-left: 20px;
+        }
+
+        #downloadBtn {
+            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            text-align: center;
+            text-decoration: none;
+            display: block;
+            font-size: 16px;
+            margin: 15px auto;
+            cursor: pointer;
+            border-radius: 50px;
+            transition: var(--transition);
+            font-weight: 500;
+            box-shadow: 0 4px 15px rgba(44, 119, 68, 0.3);
+        }
+        
+        #downloadBtn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(44, 119, 68, 0.4);
+        }
+        
+        .btn-container {
+            text-align: center;
+            margin-top: 15px;
+            margin-bottom: 10px;
+        }
+        
+        @media (max-width: 768px) {
+            th, td {
+                padding: 8px 10px;
+                font-size: 13px;
+            }
+            
+            .container {
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="page-title">Kissan 4.0: Economies of Scale Analysis</h1>
+        <p class="subtitle">Cost efficiency analysis for agricultural IoT implementation</p>
+        
+        <div class="analysis-section">
+            <h2 class="section-title">Economies of Scale: Production Cost Reduction Analysis</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Production Volume (Units)</th>
+                        <th>Cost Reduction %</th>
+                        <th>Unit Production Cost (INR)</th>
+                        <th>Fixed Costs Amortized (INR)</th>
+                        <th>Profit Margin %</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>1-10</td>
+                        <td>0%</td>
+                        <td>5,000</td>
+                        <td>7,000</td>
+                        <td class="loss">-40%</td>
+                    </tr>
+                    <tr class="highlight">
+                        <td>11-25</td>
+                        <td>10%</td>
+                        <td>4,500</td>
+                        <td>3,500</td>
+                        <td class="break-even">0%</td>
+                    </tr>
+                    <tr>
+                        <td>26-50</td>
+                        <td>15%</td>
+                        <td>4,250</td>
+                        <td>1,750</td>
+                        <td class="profit">15%</td>
+                    </tr>
+                    <tr>
+                        <td>51-100</td>
+                        <td>20%</td>
+                        <td>4,000</td>
+                        <td>875</td>
+                        <td class="profit">20%</td>
+                    </tr>
+                    <tr>
+                        <td>101-250</td>
+                        <td>25%</td>
+                        <td>3,750</td>
+                        <td>350</td>
+                        <td class="profit">25%</td>
+                    </tr>
+                    <tr>
+                        <td>&gt;250</td>
+                        <td>30%</td>
+                        <td>3,500</td>
+                        <td>175</td>
+                        <td class="profit">30%</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="notes">
+            <p><strong>Key Findings:</strong></p>
+            <ul>
+                <li>Production costs can be reduced by 30% at scale (>250 units), significantly improving profitability.</li>
+                <li>The most efficient segment appears to be Medium Farmers (4.94-9.88 acres) with balanced acquisition costs and strong margins.</li>
+                <li>Fixed costs like soil testing tools (INR 7,000) are effectively amortized when serving more than 25 farmers.</li>
+                <li>Break-even is achieved between 11-25 units where 10% cost reduction helps reach 0% profit margin (neutral point).</li>
+                <li>Higher volume production (>50 units) allows for competitive pricing while maintaining healthy profit margins.</li>
+            </ul>
+            <p><strong>Note:</strong> Fixed costs amortization shows how initial investment costs are spread across more units as production volume increases.</p>
+        </div>
+        
+        <div class="btn-container">
+            <button id="downloadBtn">Download as JPG</button>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script>
+        // Function to convert the container to an image and download it
+        document.getElementById('downloadBtn').addEventListener('click', function() {
+            const containerElement = document.querySelector('.container');
+            const downloadBtn = document.getElementById('downloadBtn');
+            
+            // Hide the download button temporarily before capturing
+            downloadBtn.style.display = 'none';
+            
+            // Use html2canvas to capture the container as an image
+            html2canvas(containerElement, {
+                scale: 2, // Higher resolution
+                useCORS: true,
+                allowTaint: true,
+                backgroundColor: "#f9fafb"
+            }).then(function(canvas) {
+                // Create a link to download the image
+                const link = document.createElement('a');
+                link.download = 'agricultural_iot_economies_of_scale.jpg';
+                link.href = canvas.toDataURL('image/jpeg', 1.0);
+                
+                // Trigger the download
+                link.click();
+                
+                // Show the button again after download
+                downloadBtn.style.display = 'block';
+            });
+        });
+    </script>
+</body>
+</html>

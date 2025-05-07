@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cropping Techniques Comparison</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f8f9fa;
+            color: #333;
+        }
+        .container {
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            padding: 30px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        h1 {
+            color: #2e7d32;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2.2rem;
+            border-bottom: 2px solid #2e7d32;
+            padding-bottom: 15px;
+        }
+        .highlight-tech {
+            background-color: #e3f2fd;
+            font-weight: bold;
+            padding: 3px 6px;
+            border-radius: 4px;
+            border-left: 3px solid #1565c0;
+        }
+        .highlight-benefit {
+            background-color: #e8f5e9;
+            font-weight: bold;
+            padding: 3px 6px;
+            border-radius: 4px;
+            border-left: 3px solid #2e7d32;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 30px;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        }
+        th {
+            background-color: #2e7d32;
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-weight: bold;
+            position: sticky;
+            top: 0;
+        }
+        td {
+            padding: 15px;
+            border-bottom: 1px solid #e0e0e0;
+            vertical-align: top;
+            line-height: 1.5;
+        }
+        tr:hover {
+            background-color: #f5f9f5;
+        }
+        tr:nth-child(even) {
+            background-color: #fafafa;
+        }
+        tr:nth-child(even):hover {
+            background-color: #f5f9f5;
+        }
+        ul {
+            margin: 0;
+            padding-left: 20px;
+        }
+        li {
+            margin-bottom: 8px;
+        }
+        li:last-child {
+            margin-bottom: 0;
+        }
+        .download-btn {
+            background-color: #2e7d32;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            display: block;
+            margin: 20px auto;
+            transition: all 0.3s ease;
+            font-weight: bold;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .download-btn:hover {
+            background-color: #1b5e20;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+        .table-container {
+            overflow-x: auto;
+            margin-top: 20px;
+            padding-bottom: 10px;
+        }
+        .content-wrapper {
+            position: relative;
+        }
+        .technique-name {
+            font-weight: bold;
+            color: #2e7d32;
+            font-size: 1.1em;
+        }
+        .technique-example {
+            color: #666;
+            font-style: italic;
+            font-size: 0.9em;
+            margin-top: 5px;
+        }
+        .technique-cell {
+            border-left: 4px solid #2e7d32;
+        }
+        .legend {
+            background-color: #f5f5f5;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+            border: 1px solid #e0e0e0;
+        }
+        .legend-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #2e7d32;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 5px;
+        }
+        .legend-mark-tech {
+            width: 20px;
+            height: 20px;
+            margin-right: 10px;
+            background-color: #e3f2fd;
+            border-left: 3px solid #1565c0;
+            border-radius: 4px;
+        }
+        .legend-mark-benefit {
+            width: 20px;
+            height: 20px;
+            margin-right: 10px;
+            background-color: #e8f5e9;
+            border-left: 3px solid #2e7d32;
+            border-radius: 4px;
+        }
+        @media print {
+            body {
+                padding: 0;
+                background-color: white;
+            }
+            .container {
+                box-shadow: none;
+                padding: 0;
+            }
+            .download-btn {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Kissan 4.0: Cropping Techniques Comparison</h1>
+        
+        <div class="legend">
+            <div class="legend-title">Key Differences Highlighted</div>
+            <div class="legend-item">
+                <div class="legend-mark-tech"></div>
+                <div>Key technical distinguishing feature</div>
+            </div>
+            <div class="legend-item">
+                <div class="legend-mark-benefit"></div>
+                <div>Key agricultural benefit</div>
+            </div>
+        </div>
+        
+        <div class="content-wrapper">
+            <div id="table-content" class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Cropping Technique</th>
+                            <th>Applicable Farm Size</th>
+                            <th>Key IoT Components Used</th>
+                            <th>Technical Functionality</th>
+                            <th>Agricultural Benefits</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Monocropping -->
+                        <tr>
+                            <td class="technique-cell">
+                                <div class="technique-name">Monocropping (Monoculture)</div>
+                                <div class="technique-example">(e.g., wheat, rice, maize)</div>
+                            </td>
+                            <td>Marginal, Small</td>
+                            <td>Soil probe (NPK, pH, moisture), microclimate array (temperature, humidity), ESP32, GSM, relay, contactor (Marginal); wall-mounted display (Small)</td>
+                            <td>
+                                <ul>
+                                    <li><span class="highlight-tech">All systems optimized for single crop needs</span>: Soil Probe measures NPK, pH, and moisture every 6 hours, tailored to one crop type (e.g., rice needs pH 5.5–6.5).</li>
+                                    <li>Microclimate Array: Monitors temperature and humidity (e.g., 70–90% humidity for rice), updating every 2 hours.</li>
+                                    <li>Relay/Contactor: Automates irrigation based on crop-specific moisture thresholds (e.g., <30% for wheat).</li>
+                                    <li>Platform: Provides real-time nutrient alerts (e.g., low nitrogen in maize) and pest risks (e.g., stem borers in rice) via SMS.</li>
+                                    <li>Display (Small): Shows daily soil and weather analytics for uniform crop management.</li>
+                                </ul>
+                            </td>
+                            <td>
+                                <ul>
+                                    <li><span class="highlight-benefit">Maximum efficiency for single crop type</span>: 10–20% yield increase by optimizing all inputs specifically for one crop (e.g., precise urea application for wheat).</li>
+                                    <li>Water Savings: 30–50% via automated drip irrigation (e.g., maize needs 500–800 mm/season).</li>
+                                    <li>Pest Detection: Early alerts for crop-specific pests (e.g., aphids in pulses), reducing losses by 10–15%.</li>
+                                    <li>Soil Health: Monitors nutrient depletion from repeated cropping, guiding corrective measures (e.g., add potassium).</li>
+                                </ul>
+                            </td>
+                        </tr>
+                        
+                        <!-- Mixed Cropping -->
+                        <tr>
+                            <td class="technique-cell">
+                                <div class="technique-name">Mixed Cropping</div>
+                                <div class="technique-example">(e.g., maize + beans scattered)</div>
+                            </td>
+                            <td>Marginal, Small</td>
+                            <td>Soil probe (NPK, pH, moisture), microclimate array, ESP32, GSM, relay, contactor (Marginal); wall-mounted display (Small)</td>
+                            <td>
+                                <ul>
+                                    <li><span class="highlight-tech">Balances needs of multiple randomly distributed crops</span>: Multiple probes (1 per 0.5 acre) monitor NPK, pH, and moisture for mixed crops, averaging needs (e.g., maize needs nitrogen, beans need phosphorus).</li>
+                                    <li>Microclimate Array: Tracks temperature and humidity to suit both crops (e.g., 60–70% humidity for beans).</li>
+                                    <li>ESP32/GSM: Aggregates data for cloud-based analytics, balancing crop requirements.</li>
+                                    <li>Relay/Contactor: Controls irrigation for mixed root zones (e.g., drip for maize, sprinkler for beans).</li>
+                                    <li>Platform: Provides generalized nutrient and pest alerts for mixed crops, considering interactions (e.g., beans fix nitrogen).</li>
+                                    <li>Display (Small): Visualizes combined crop analytics.</li>
+                                </ul>
+                            </td>
+                            <td>
+                                <ul>
+                                    <li><span class="highlight-benefit">Natural biological complementarity</span>: 10–20% yield increase by utilizing natural synergies (e.g., reduced fertilizer for maize due to bean nitrogen fixation).</li>
+                                    <li>Water Savings: 25–40% with tailored irrigation for mixed crops.</li>
+                                    <li>Pest Detection: Alerts for pests affecting any crop (e.g., pod borers in beans), protecting overall yield.</li>
+                                    <li>Land Efficiency: Enhances output from small plots (e.g., 1.5x yield from maize + beans vs. maize alone).</li>
+                                </ul>
+                            </td>
+                        </tr>
+                        
+                        <!-- Intercropping -->
+                        <tr>
+                            <td class="technique-cell">
+                                <div class="technique-name">Intercropping</div>
+                                <div class="technique-example">(e.g., maize + beans in alternating rows)</div>
+                            </td>
+                            <td>Marginal, Small</td>
+                            <td>Soil probe (NPK, pH, moisture), microclimate array, ESP32, GSM, relay, contactor (Marginal); wall-mounted display (Small)</td>
+                            <td>
+                                <ul>
+                                    <li><span class="highlight-tech">Zone-specific monitoring for organized row patterns</span>: Soil Probes deployed in rows (1 per 0.5 acre), monitor NPK and pH for each crop separately (e.g., high nitrogen for maize, phosphorus for beans).</li>
+                                    <li>Microclimate Array: Ensures humidity and temperature suit both crops (e.g., maize tolerates 20–30°C, beans prefer cooler).</li>
+                                    <li>ESP32/GSM: Sends row-specific data to platform for crop-specific analytics.</li>
+                                    <li>Relay/Contactor: Enables zone-specific irrigation (e.g., drip for maize rows, sprinkler for bean rows).</li>
+                                    <li>Platform: Analyzes crop interactions and sends tailored nutrient/pest alerts (e.g., maize weevil alerts).</li>
+                                    <li>Display (Small): Shows row-based analytics (e.g., maize vs. bean nutrient uptake).</li>
+                                </ul>
+                            </td>
+                            <td>
+                                <ul>
+                                    <li><span class="highlight-benefit">Precise control of crop interactions</span>: 10–20% yield increase through organized companion planting, allowing precise management of beneficial interactions (e.g., 20% less nitrogen fertilizer for maize rows next to beans).</li>
+                                    <li>Water Savings: 25–40% with precise irrigation per row.</li>
+                                    <li>Pest Detection: Reduces losses by 10–15% with crop-specific pest alerts (e.g., bean leaf beetles).</li>
+                                    <li>Soil Fertility: Enhances nitrogen fixation (e.g., beans improve soil for maize), reducing long-term inputs.</li>
+                                </ul>
+                            </td>
+                        </tr>
+                        
+                        <!-- Crop Rotation -->
+                        <tr>
+                            <td class="technique-cell">
+                                <div class="technique-name">Crop Rotation</div>
+                                <div class="technique-example">(e.g., wheat → pulses → maize)</div>
+                            </td>
+                            <td>Marginal, Small, Medium</td>
+                            <td>Soil probe (NPK, pH, moisture), microclimate array, ESP32, GSM, relay, contactor (Marginal/Small); mini climate station, AI assistance, wall/touch display (Medium)</td>
+                            <td>
+                                <ul>
+                                    <li><span class="highlight-tech">Historical data tracking across seasons</span>: Soil Probe tracks NPK, pH, and moisture across multiple growing seasons, adjusting for each crop in sequence (e.g., pulses restore nitrogen post-wheat).</li>
+                                    <li>Microclimate Array/Mini Climate Station: Monitors seasonal weather changes (e.g., humidity for pulses, temperature for maize).</li>
+                                    <li>ESP32/GSM: Stores historical data for crop sequence analysis.</li>
+                                    <li>Relay/Contactor: Adjusts irrigation for each crop's needs (e.g., flood for wheat, drip for maize).</li>
+                                    <li>Platform: Uses AI (Medium) to recommend rotation schedules and nutrient plans based on soil history.</li>
+                                    <li>Display: Tracks soil health trends across rotations (e.g., nitrogen levels post-pulses).</li>
+                                </ul>
+                            </td>
+                            <td>
+                                <ul>
+                                    <li><span class="highlight-benefit">Long-term soil health improvement</span>: 15–25% yield increase by breaking pest cycles and building cumulative soil benefits over multiple seasons (e.g., pulses boost subsequent maize yield by 10–15%).</li>
+                                    <li>Water Savings: 30–50% with crop-specific irrigation (e.g., pulses need less water than wheat).</li>
+                                    <li>Pest/Disease Control: Reduces pest buildup (e.g., wheat root pests decline after pulses), cutting losses by 15–20%.</li>
+                                    <li>Soil Health: Maintains fertility by monitoring nutrient trends, preventing depletion.</li>
+                                </ul>
+                            </td>
+                        </tr>
+                        
+                        <!-- Sequential Cropping -->
+                        <tr>
+                            <td class="technique-cell">
+                                <div class="technique-name">Sequential Cropping</div>
+                                <div class="technique-example">(e.g., rice → wheat in one year)</div>
+                            </td>
+                            <td>Marginal, Small, Medium</td>
+                            <td>Soil probe (NPK, pH, moisture), microclimate array, ESP32, GSM, relay, contactor (Marginal/Small); mini climate station, AI assistance, wall/touch display (Medium)</td>
+                            <td>
+                                <ul>
+                                    <li><span class="highlight-tech">Rapid transition monitoring between crops</span>: Soil Probe monitors NPK, pH, and moisture for back-to-back crops within a single year, providing fast transition data (e.g., rice needs pH 5.5–6.5, wheat needs 6.0–7.0).</li>
+                                    <li>Microclimate Array/Mini Climate Station: Tracks seasonal shifts (e.g., high humidity for rice, cooler for wheat).</li>
+                                    <li>ESP32/GSM: Provides real-time data for rapid crop transitions.</li>
+                                    <li>Relay/Contactor: Switches irrigation modes (e.g., flood for rice, drip for wheat).</li>
+                                    <li>Platform: Recommends nutrient adjustments between crops (e.g., potassium post-rice).</li>
+                                    <li>Display: Shows analytics for each crop cycle (e.g., soil recovery post-rice).</li>
+                                </ul>
+                            </td>
+                            <td>
+                                <ul>
+                                    <li><span class="highlight-benefit">Maximized land use through time efficiency</span>: Enables two complete crops per year in the same field, dramatically increasing annual productivity (e.g., rice followed by wheat in same calendar year).</li>
+                                    <li>Yield Increase: 15–25% by optimizing inputs for each crop (e.g., precise phosphorus for wheat).</li>
+                                    <li>Water Savings: 30–50% with tailored irrigation (e.g., rice needs 1200–1500 mm, wheat needs 400–600 mm).</li>
+                                    <li>Pest Detection: Alerts for crop-specific pests (e.g., rice stem borers, wheat aphids), reducing losses by 10–15%.</li>
+                                </ul>
+                            </td>
+                        </tr>
+                        
+                        <!-- Relay Cropping -->
+                        <tr>
+                            <td class="technique-cell">
+                                <div class="technique-name">Relay Cropping</div>
+                                <div class="technique-example">(e.g., wheat + soybeans near wheat maturity)</div>
+                            </td>
+                            <td>Marginal, Small, Medium</td>
+                            <td>Soil probe (NPK, pH, moisture), microclimate array, ESP32, GSM, relay, contactor (Marginal/Small); mini climate station, AI assistance, wall/touch display (Medium)</td>
+                            <td>
+                                <ul>
+                                    <li><span class="highlight-tech">Simultaneous management of crops at different growth stages</span>: Soil Probe monitors NPK, pH, and moisture for overlapping crops at different maturity levels (e.g., mature wheat alongside young soybeans).</li>
+                                    <li>Microclimate Array/Mini Climate Station: Tracks conditions for both crops (e.g., wheat needs 15–25°C, soybeans need 20–30°C).</li>
+                                    <li>ESP32/GSM: Sends real-time data for both crops during overlap.</li>
+                                    <li>Relay/Contactor: Manages irrigation for maturing and new crops (e.g., reduced water for wheat, drip for soybeans).</li>
+                                    <li>Platform: Uses AI (Medium) to balance nutrient needs and predict pest risks (e.g., soybean pod borers).</li>
+                                    <li>Display: Shows dual-crop analytics during transition.</li>
+                                </ul>
+                            </td>
+                            <td>
+                                <ul>
+                                    <li><span class="highlight-benefit">Eliminates transition time between crops</span>: Maximizes land use by starting second crop before first is harvested, eliminating any fallow period and extending growing season.</li>
+                                    <li>Yield Increase: 15–25% by optimizing inputs for overlapping crops.</li>
+                                    <li>Water Savings: 25–40% with precise irrigation during crop overlap.</li>
+                                    <li>Pest Detection: Reduces losses by 10–15% with alerts for both crops (e.g., wheat rust, soybean beetles).</li>
+                                </ul>
+                            </td>
+                        </tr>
+                        
+                        <!-- Alley Cropping -->
+                        <tr>
+                            <td class="technique-cell">
+                                <div class="technique-name">Alley Cropping</div>
+                                <div class="technique-example">(e.g., crops between mango trees)</div>
+                            </td>
+                            <td>Medium, Large</td>
+                            <td>Soil probe (NPK, pH, moisture), mini climate station, ESP32, GSM, AI camera, ultrasonic wind sensor, wall/touch display, solar panel (Large), AI assistance</td>
+                            <td>
+                                <ul>
+                                    <li><span class="highlight-tech">Advanced management of tree-crop interactions</span>: Soil Probe monitors NPK, pH, and moisture for perennial trees and annual crops simultaneously, managing different root depths and canopy interactions.</li>
+                                    <li>Mini Climate Station: Tracks microclimate under tree canopy (e.g., shade reduces temperature by 2–5°C).</li>
+                                    <li>AI Camera: Detects pests for both crops and trees (e.g., mango hoppers, crop aphids).</li>
+                                    <li>Ultrasonic Wind Sensor: Optimizes pesticide spraying under trees.</li>
+                                    <li>ESP32/GSM: Integrates crop and tree data for cloud analytics.</li>
+                                    <li>Solar Panel: Powers devices in remote fields.</li>
+                                    <li>Platform/AI Assistance: Recommends nutrient and irrigation plans for crops and trees.</li>
+                                    <li>Display: Visualizes crop-tree interactions (e.g., soil moisture under canopy).</li>
+                                </ul>
+                            </td>
+                            <td>
+                                <ul>
+                                    <li><span class="highlight-benefit">Multi-year production from both trees and annual crops</span>: Combines short-term income from crops with long-term tree production, creating sustainable agroforestry system with 20–40% higher total yield.</li>
+                                    <li>Water Savings: 40–60% with drip irrigation for crops and trees.</li>
+                                    <li>Pest/Disease Control: Reduces losses by 20–30% with AI-driven pest detection.</li>
+                                    <li>Soil Fertility: Enhances soil health via tree litter and crop rotations, monitored by probes.</li>
+                                </ul>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <button id="download-btn" class="download-btn">Download as JPG</button>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('download-btn').addEventListener('click', function() {
+            // Hide the download button temporarily
+            this.style.display = 'none';
+            
+            // Use html2canvas
+            const script = document.createElement('script');
+            script.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
+            script.onload = function() {
+                html2canvas(document.querySelector('.content-wrapper')).then(canvas => {
+                    // Create an image
+                    const image = canvas.toDataURL('image/jpeg', 1.0);
+                    
+                    // Create a link to download
+                    const link = document.createElement('a');
+                    link.download = 'cropping_techniques_comparison.jpg';
+                    link.href = image;
+                    link.click();
+                    
+                    // Show the button again
+                    document.getElementById('download-btn').style.display = 'block';
+                });
+            };
+            document.head.appendChild(script);
+        });
+    </script>
+</body>
+</html>
